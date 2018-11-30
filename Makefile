@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: dde-jesu <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/06 16:01:17 by dde-jesu          #+#    #+#              #
-#    Updated: 2018/11/29 20:06:13 by bdevessi         ###   ########.fr        #
+#    Updated: 2018/11/30 11:03:00 by bdevessi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,5 @@ fclean: clean
 	rm -rf $(NAME)
 
 re: fclean $(NAME)
-
 
 .PHONY: clean fclean re proto

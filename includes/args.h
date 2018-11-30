@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/11/30 10:19:13 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/11/30 11:07:27 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,9 @@ typedef struct		s_entry
 
 typedef struct		s_args
 {
-	uint8_t		flags;
-	t_entry		*entries;
+	uint8_t	flags;
+	char	**entries;
+	int		entries_count;
 }					t_args;
 
 typedef struct		s_argument

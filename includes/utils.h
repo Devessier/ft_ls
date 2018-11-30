@@ -1,25 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   utils.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/11/30 14:34:45 by bdevessi         ###   ########.fr       */
+/*   Created: 2018/11/30 14:58:02 by bdevessi          #+#    #+#             */
+/*   Updated: 2018/11/30 16:41:12 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "args.h"
-#include "list.h"
-#include <stdio.h>
+#ifndef UTILS_H
+# define UTILS_H
+# include <string.h>
 
-int	main(int argc, char **argv)
-{
-	t_args	arguments = parse_args(--argc, ++argv);
+size_t		ft_strlen(char *str);
+char		*ft_strcat(char *s1, const char *s2);
+void		ft_putf_fd(int fd, const char *format, ...);
+void		ft_putstr_fd(char *str, int fd);
+void		ft_putnbr_fd(int n, int fd);
+void		ft_putendl_fd(char *str, int fd);
 
-	if (!arguments.entries_count)
-		list(".", arguments.flags);
-	while (arguments.entries_count--)
-		list(*arguments.entries++, arguments.flags);
-}
+#endif

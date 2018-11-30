@@ -1,25 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   list.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/11/30 14:34:45 by bdevessi         ###   ########.fr       */
+/*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
+/*   Updated: 2018/11/30 14:27:17 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "args.h"
-#include "list.h"
-#include <stdio.h>
+#ifndef LIST_H
+# define LIST_H
+# include <stdint.h>
 
-int	main(int argc, char **argv)
-{
-	t_args	arguments = parse_args(--argc, ++argv);
+void	list(char *path, uint8_t flags);
 
-	if (!arguments.entries_count)
-		list(".", arguments.flags);
-	while (arguments.entries_count--)
-		list(*arguments.entries++, arguments.flags);
-}
+#endif

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/11/30 10:19:52 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/11/30 13:55:07 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ uint8_t		parse_flags(char *flag)
 	uint8_t	flags;
 	uint8_t	i;
 
-	flags = 0;
+	flags = FLAG_NONE;
 	while (*++flag)
 	{
 		i = 0;
@@ -43,29 +43,27 @@ uint8_t		parse_flags(char *flag)
 
 t_args		parse_args(int len, char **args)
 {
-	uint8_t	end_of_flags;
-	uint8_t	flags;
-	int		entries_count;
-	int		i;
+	uint8_t		end_of_flags;
+	uint8_t		flags;
+	int			entries_count;
+	int			i;
 
 	entries_count = 0;
 	end_of_flags = 0;
 	flags = 0;
-	i = 0;
-	while (i < len)
+	i = -1;
+	while (++i < len)
 	{
-		printf("len = %d | arg = %s\n", len, args[i]);
 		if (!end_of_flags
 				&& ((*args[i] == '-' && args[i][1] == '-')
 					|| (*args[i] != '-' && !end_of_flags)))
 			end_of_flags ^= 1;
+		if (*args[i] == '-' && args[i][1] == '-')
+			continue ;
 		if (!end_of_flags)
 			flags |= parse_flags(args[i]);
 		else
-		{
-			// arg is a string representing a file/dir/…
-		}
-		i++;
+			entries_count++;
 	}
-	return ((t_args){ flags, NULL });
+	return ((t_args){ flags, args + (len - entries_count), entries_count });
 }

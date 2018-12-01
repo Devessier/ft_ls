@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/11/30 11:07:27 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/01 17:36:21 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define ARGS_H
 # include <stdint.h>
 # include <dirent.h>
+# include <sys/stat.h>
 
 typedef enum		e_flag
 {
@@ -27,15 +28,49 @@ typedef enum		e_flag
 
 typedef struct		s_entry
 {
-	DIR	*dirp;
+	uint16_t	record_len;
+	uint16_t	name_len;
+	uint8_t		type;
+	char		name[1024];
+	struct stat	*stats;
 }					t_entry;
 
-typedef struct		s_args
+typedef struct		s_stat
+{
+	dev_t		st_dev;
+	mode_t		st_mode;
+	nlink_t		st_nlink;
+	ino_t		st_ino;
+	uid_t		st_uid;
+	gid_t		st_gid;
+	dev_t		st_rdev;
+	struct timespec	st_atimespec;
+	struct timespec	st_mtimespec;
+	struct timespec	st_ctimespec;
+	struct timespec	st_birthtimespec;
+	off_t		st_size;
+	blkcnt_t	st_blocks;
+	blksize_t	st_blksize;
+	uint32_t	st_flags;
+	uint32_t	st_gen;
+	char		*name;
+}					t_stat;
+
+typedef struct		s_ls_args
 {
 	uint8_t	flags;
-	char	**entries;
-	int		entries_count;
-}					t_args;
+	int	len;
+	int	cap;
+	t_stat	**stats;
+}					t_ls_args;
+
+typedef struct		s_entries
+{
+	uint8_t	flags;
+	int	cap;
+	int	len;
+	t_entry	*entries;
+}					t_entries;
 
 typedef struct		s_argument
 {
@@ -45,6 +80,6 @@ typedef struct		s_argument
 
 extern t_argument	g_arguments[];
 
-t_args				parse_args(int len, char **args);
+t_ls_args				parse_args(int len, char **args);
 
 #endif

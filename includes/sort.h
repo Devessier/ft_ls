@@ -1,22 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   list.h                                             :+:      :+:    :+:   */
+/*   sort.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/11/30 23:26:05 by bdevessi         ###   ########.fr       */
+/*   Created: 2018/12/01 13:25:26 by bdevessi          #+#    #+#             */
+/*   Updated: 2018/12/01 14:29:57 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LIST_H
-# define LIST_H
-# include <dirent.h>
-# include <stdint.h>
-# include "args.h"
+#ifndef SORT_H
+# define SORT_H
 
-void	list(t_entry *entry, uint8_t flags);
-void	error(char *path);
+void	quick_sort(void **list, int start, int end, int (*f)(void *, void *));
+int	ft_strcmp(void *s1, void *s2);
 
 #endif

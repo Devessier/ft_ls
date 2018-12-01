@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/11/30 13:55:07 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/01 17:33:06 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/stat.h>
+#include "list.h"
+#include <errno.h>
+#include "utils.h"
+#include "sort.h"
 
 t_argument	g_arguments[] =
 {
@@ -24,6 +29,16 @@ t_argument	g_arguments[] =
 	{ 't', FLAG_SORT_TIME_MODIFIED },
 	{ 0, FLAG_NONE }
 };
+
+void		init_arguments(t_ls_args *self)
+{
+	*self = (t_ls_args) {
+		.flags = 0,
+		.len = 0,
+		.cap = 0,
+		.stats = NULL
+	};
+}
 
 uint8_t		parse_flags(char *flag)
 {
@@ -41,29 +56,52 @@ uint8_t		parse_flags(char *flag)
 	return (flags);
 }
 
-t_args		parse_args(int len, char **args)
+void		append_arg(t_ls_args *arguments, char *path)
+{
+	t_stat	**tmp;
+	int	i;
+
+	if (arguments->len + 1 >= arguments->cap)
+	{
+		tmp = arguments->stats;
+		arguments->cap = !arguments->cap ? 10 : arguments->cap * 10;
+		if (!(arguments->stats = (t_stat **)malloc(sizeof(t_stat *) * arguments->cap)))
+			ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno));
+		i = -1;
+		while (++i < arguments->len)
+			arguments->stats[i] = tmp[i];
+		if (tmp)
+			free(tmp);
+	}
+	if (!(arguments->stats[arguments->len] = (t_stat *)malloc(sizeof(t_stat))))
+		ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno));
+	if (stat(path, (struct stat *)arguments->stats[arguments->len]) != 0)
+		ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno));
+	arguments->stats[arguments->len++]->name = path;
+}
+
+t_ls_args	parse_args(int len, char **args)
 {
 	uint8_t		end_of_flags;
-	uint8_t		flags;
-	int			entries_count;
+	t_ls_args	arguments;
 	int			i;
 
-	entries_count = 0;
+	init_arguments(&arguments);
 	end_of_flags = 0;
-	flags = 0;
-	i = -1;
-	while (++i < len)
+	i = 0;
+	while (i < len && *args[i] == '-' && !end_of_flags)
 	{
-		if (!end_of_flags
-				&& ((*args[i] == '-' && args[i][1] == '-')
-					|| (*args[i] != '-' && !end_of_flags)))
+		if (args[i][1] == '-')
 			end_of_flags ^= 1;
-		if (*args[i] == '-' && args[i][1] == '-')
-			continue ;
-		if (!end_of_flags)
-			flags |= parse_flags(args[i]);
 		else
-			entries_count++;
+			arguments.flags |= parse_flags(args[i]);
+		i++;
 	}
-	return ((t_args){ flags, args + (len - entries_count), entries_count });
+	if (!(len - i))
+		append_arg(&arguments, ".");
+	else if (len - i > 1)
+		quick_sort((void **)args, i, len - 1, ft_strcmp);
+	while (i < len)
+		append_arg(&arguments, args[i++]);
+	return (arguments);
 }

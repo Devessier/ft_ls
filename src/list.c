@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/11/30 16:46:24 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/01 17:17:54 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,14 @@ void	error(char *path)
 	exit(1);
 }
 
-void	list(char *path, uint8_t flags)
+void	list(t_entry *entry, uint8_t flags)
 {
 	DIR				*directory;
 	struct dirent	*d;
 
 	errno = 0;
-	if (!(directory = opendir(path)))
-		error(path);
+	if (!(directory = opendir(entry->name)))
+		error(entry->name);
 	while ((d = readdir(directory)) != NULL)
 	{
 		if (*d->d_name == '.' && !(flags & FLAG_INCLUDE_DOTS))

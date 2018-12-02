@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/01 17:36:21 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/02 00:43:28 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,10 @@ typedef struct		s_stat
 	blksize_t	st_blksize;
 	uint32_t	st_flags;
 	uint32_t	st_gen;
-	char		*name;
-}					t_stat;
+	uint8_t		d_type;
+	char		*d_name;
+	char		*d_shname;
+}			t_stat;
 
 typedef struct		s_ls_args
 {
@@ -62,15 +64,15 @@ typedef struct		s_ls_args
 	int	len;
 	int	cap;
 	t_stat	**stats;
-}					t_ls_args;
+}			t_ls_args;
 
 typedef struct		s_entries
 {
 	uint8_t	flags;
 	int	cap;
 	int	len;
-	t_entry	*entries;
-}					t_entries;
+	t_stat	**stats;
+}			t_entries;
 
 typedef struct		s_argument
 {
@@ -80,6 +82,7 @@ typedef struct		s_argument
 
 extern t_argument	g_arguments[];
 
-t_ls_args				parse_args(int len, char **args);
+t_entries		parse_args(int len, char **args);
+void			append_entry(t_entries *entries, char *long_name, char *short_name);
 
 #endif

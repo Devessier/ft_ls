@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/01 17:33:06 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/02 00:46:46 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,18 @@ t_argument	g_arguments[] =
 	{ 0, FLAG_NONE }
 };
 
-void		init_arguments(t_ls_args *self)
+int		normalize_argument(char **str)
 {
-	*self = (t_ls_args) {
-		.flags = 0,
-		.len = 0,
-		.cap = 0,
-		.stats = NULL
-	};
+	int		i;
+
+	i = 0;
+	while ((*str)[i])
+		i++;
+	if (i)
+		i--;
+	while (i && (*str)[i] == '/')
+		(*str)[i--] = '\0';
+	return (i);
 }
 
 uint8_t		parse_flags(char *flag)
@@ -56,37 +60,37 @@ uint8_t		parse_flags(char *flag)
 	return (flags);
 }
 
-void		append_arg(t_ls_args *arguments, char *path)
+void		append_entry(t_entries *entries, char *long_name, char *short_name)
 {
 	t_stat	**tmp;
 	int	i;
 
-	if (arguments->len + 1 >= arguments->cap)
+	if (entries->len + 1 >= entries->cap)
 	{
-		tmp = arguments->stats;
-		arguments->cap = !arguments->cap ? 10 : arguments->cap * 10;
-		if (!(arguments->stats = (t_stat **)malloc(sizeof(t_stat *) * arguments->cap)))
-			ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno));
+		tmp = entries->stats;
+		entries->cap = !entries->cap ? 10 : entries->cap * 10;
+		if (!(entries->stats = (t_stat **)malloc(sizeof(t_stat *) * entries->cap)))
+			error(long_name);
 		i = -1;
-		while (++i < arguments->len)
-			arguments->stats[i] = tmp[i];
-		if (tmp)
+		while (++i < entries->len)
+			entries->stats[i] = tmp[i];
+		if (tmp && entries->len)
 			free(tmp);
 	}
-	if (!(arguments->stats[arguments->len] = (t_stat *)malloc(sizeof(t_stat))))
-		ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno));
-	if (stat(path, (struct stat *)arguments->stats[arguments->len]) != 0)
-		ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno));
-	arguments->stats[arguments->len++]->name = path;
+	if (!(entries->stats[entries->len] = (t_stat *)malloc(sizeof(t_stat)))
+		|| stat(long_name, (struct stat *)entries->stats[entries->len]) != 0)
+		error(long_name);
+	entries->stats[entries->len]->d_name = long_name;
+	entries->stats[entries->len++]->d_shname = short_name;
 }
 
-t_ls_args	parse_args(int len, char **args)
+t_entries	parse_args(int len, char **args)
 {
 	uint8_t		end_of_flags;
-	t_ls_args	arguments;
-	int			i;
+	t_entries	arguments;
+	int		i;
 
-	init_arguments(&arguments);
+	arguments = (t_entries){ 0, 0, 0, NULL };
 	end_of_flags = 0;
 	i = 0;
 	while (i < len && *args[i] == '-' && !end_of_flags)
@@ -98,10 +102,14 @@ t_ls_args	parse_args(int len, char **args)
 		i++;
 	}
 	if (!(len - i))
-		append_arg(&arguments, ".");
+		append_entry(&arguments, ".", ".");
 	else if (len - i > 1)
 		quick_sort((void **)args, i, len - 1, ft_strcmp);
 	while (i < len)
-		append_arg(&arguments, args[i++]);
+	{
+		normalize_argument(&args[i]);
+		append_entry(&arguments, args[i], args[i]);
+		i++;
+	}
 	return (arguments);
 }

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/01 17:34:57 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/02 01:26:01 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,24 +14,20 @@
 #include "list.h"
 #include <stdio.h>
 #include <sys/stat.h>
+#include "utils.h"
 
 int	main(int argc, char **argv)
 {
-	t_ls_args	arguments = parse_args(--argc, ++argv);
+	const	t_entries	arguments = parse_args(--argc, ++argv);
+	int	i;
 
-	/*if (!entries->len)
-		list((t_entries){
-			.flags = entries->flags;
-			.cap = 1,
-			.len = 1,
-			.entries = &(t_entry)
-		}, entries->flags);*/
-	int	i = 0;
-	while (arguments.len--)
+	i = 0;
+	while (i < arguments.len)
 	{
-		printf("mode of %s : %d\n", arguments.stats[i]->name, arguments.stats[i]->st_mode);
-		i++;
+		if (arguments.len > 1 && (arguments.stats[i]->st_mode))
+			ft_putf_fd(1, "%s:\n", arguments.stats[i]->d_shname);
+		list_argument(arguments.stats[i], arguments.flags);
+		if (arguments.len - i++ > 1)
+			ft_putchar_fd('\n', 1);
 	}
-	//while (entries->len--)
-	//	list(entries->entries++, entries->flags);
 }

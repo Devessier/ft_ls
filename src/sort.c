@@ -6,11 +6,12 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 13:04:38 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/01 17:41:05 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/01 19:57:10 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <string.h>
+#include "args.h"
 
 int	ft_strcmp(void *s1, void *s2)
 {
@@ -24,6 +25,11 @@ int	ft_strcmp(void *s1, void *s2)
 	while (c_1[i] == c_2[i] && c_1[i] && c_2[i])
 		i++;
 	return ((unsigned char)c_1[i] - (unsigned char)c_2[i]);
+}
+
+int	ft_d_name_sort(void *d1, void *d2)
+{
+	return (ft_strcmp((void *)(((t_stat *)d1)->d_name), (void *)(((t_stat *)d2)->d_name)));
 }
 
 void	swap(void **a, void **b)

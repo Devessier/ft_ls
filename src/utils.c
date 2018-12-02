@@ -6,13 +6,15 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 14:57:05 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/11/30 16:40:39 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/02 00:05:51 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <string.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 size_t		ft_strlen(char *str)
 {
@@ -103,4 +105,32 @@ void		ft_putf_fd(int fd, const char *format, ...)
 			ft_putchar_fd(*format++, fd);
 	}
 	va_end(args);
+}
+
+char	*pathjoin(char *s1, char *s2)
+{
+	char			*str;
+	unsigned int		i;
+	unsigned int		j;
+	size_t			len;
+
+	if (!(s1 && s2))
+		return (NULL);
+	len = ft_strlen(s1) + ft_strlen(s2) + 1;
+	if (!(str = (char *)malloc(len + 1)))
+		return (NULL);
+	while (len)
+		str[len--] = 0;
+	i = 0;
+	while (i[s1])
+		*str++ = s1[i++];
+	if (str[-1] != '/')
+	{
+		*str++ = '/';
+		i++;
+	}
+	j = 0;
+	while (j[s2])
+		*str++ = s2[j++];
+	return (str - i - j);
 }

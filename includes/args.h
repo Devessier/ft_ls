@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/02 00:43:28 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/02 11:55:43 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,6 @@ typedef struct		s_argument
 extern t_argument	g_arguments[];
 
 t_entries		parse_args(int len, char **args);
-void			append_entry(t_entries *entries, char *long_name, char *short_name);
+int			append_entry(t_entries *entries, char *long_name, char *short_name);
 
 #endif

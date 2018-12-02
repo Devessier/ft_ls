@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/02 00:46:46 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/02 12:19:20 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ uint8_t		parse_flags(char *flag)
 	return (flags);
 }
 
-void		append_entry(t_entries *entries, char *long_name, char *short_name)
+int		append_entry(t_entries *entries, char *long_name, char *short_name)
 {
 	t_stat	**tmp;
 	int	i;
@@ -77,11 +77,13 @@ void		append_entry(t_entries *entries, char *long_name, char *short_name)
 		if (tmp && entries->len)
 			free(tmp);
 	}
+	errno = 0;
 	if (!(entries->stats[entries->len] = (t_stat *)malloc(sizeof(t_stat)))
 		|| stat(long_name, (struct stat *)entries->stats[entries->len]) != 0)
-		error(long_name);
+		return (error(long_name));
 	entries->stats[entries->len]->d_name = long_name;
 	entries->stats[entries->len++]->d_shname = short_name;
+	return (0);
 }
 
 t_entries	parse_args(int len, char **args)

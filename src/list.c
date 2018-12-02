@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/02 01:34:25 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/02 12:34:58 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,23 @@
 #include "args.h"
 #include "sort.h"
 
-void	error(char *path)
+int	error(char *path)
 {
 	ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno))	;
+	return (1);
 }
 
 void	list_file(t_stat *stats, uint8_t flags)
 {
 	if (!(flags & FLAG_LONG_FORMAT))
 		ft_putf_fd(1, "%s\n", stats->d_shname);
+}
+
+void	free_stats(t_stat *stats)
+{
+	free(stats->d_shname);
+	free(stats->d_name);
+	free(stats);
 }
 
 void	list_dir(t_stat *stats, uint8_t flags, uint8_t print_name)
@@ -43,12 +51,13 @@ void	list_dir(t_stat *stats, uint8_t flags, uint8_t print_name)
 	entries = (t_entries){ flags, 0, 0, NULL };
 	errno = 0;
 	if (!(directory = opendir(stats->d_name)))
-		error(stats->d_name);
+		return ((void)error(stats->d_name));
 	while ((d = readdir(directory)) != NULL)
 	{
 		if (*d->d_name == '.' && !(flags & FLAG_INCLUDE_DOTS))
 			continue ;
-		append_entry(&entries, pathjoin(stats->d_name, d->d_name), strdup(d->d_name));
+		if (append_entry(&entries, pathjoin(stats->d_name, d->d_name), strdup(d->d_name)))
+			return ;
 	}
 	if (entries.len > 1)
 		quick_sort((void **)entries.stats, 0, entries.len -1, ft_d_name_sort);
@@ -57,9 +66,17 @@ void	list_dir(t_stat *stats, uint8_t flags, uint8_t print_name)
 		list_file(entries.stats[i++], entries.flags);
 	i = 0;
 	while ((flags & FLAG_RECURSIVE) && i < entries.len)
+	{
 		if (S_ISDIR(entries.stats[i++]->st_mode))
+		{
 			list_dir(entries.stats[i - 1], flags, 1);
+			free_stats(entries.stats[i - 1]);
+		}
+		else
+			free_stats(entries.stats[i - 1]);
+	}
 	closedir(directory);
+	free(entries.stats);
 }
 
 void	list_argument(t_stat *argstat, uint8_t flags)

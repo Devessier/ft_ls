@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 12:27:57 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 13:02:39 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ typedef enum		e_flag
 	FLAG_RECURSIVE = 1 << 1,
 	FLAG_INCLUDE_DOTS = 1 << 2,
 	FLAG_REVERSE_SORT = 1 << 3,
-	FLAG_SORT_TIME_MODIFIED = 1 << 4
+	FLAG_SORT_TIME_MODIFIED = 1 << 4,
+	FLAG_COLORS_ON = 1 << 5
 }					t_flag;
 
 typedef struct		s_entry

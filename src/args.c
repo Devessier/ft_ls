@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 12:29:30 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 13:18:07 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <errno.h>
 #include "utils.h"
 #include "sort.h"
+#include <unistd.h>
 
 t_argument	g_arguments[] =
 {
@@ -27,6 +28,7 @@ t_argument	g_arguments[] =
 	{ 'a', FLAG_INCLUDE_DOTS },
 	{ 'r', FLAG_REVERSE_SORT },
 	{ 't', FLAG_SORT_TIME_MODIFIED },
+	{ 'G', FLAG_COLORS_ON },
 	{ 0, FLAG_NONE }
 };
 
@@ -57,6 +59,8 @@ uint8_t		parse_flags(char *flag)
 			if (g_arguments[i++].c_flag == *flag)
 				flags |= g_arguments[i - 1].flag;
 	}
+	if ((flags & FLAG_COLORS_ON) && !isatty(1))
+		flags ^= FLAG_COLORS_ON;
 	return (flags);
 }
 
@@ -95,7 +99,7 @@ t_entries	parse_args(int len, char **args)
 	int			i;
 	int			j;
 
-	arguments = (t_entries){ 0, 0, 0, NULL };
+	arguments = (t_entries) { isatty(1) ? FLAG_COLORS_ON : 0, 0, 0, NULL };
 	end_of_flags = 0;
 	i = 0;
 	while (i < len && *args[i] == '-' && !end_of_flags)

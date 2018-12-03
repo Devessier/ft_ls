@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 12:43:59 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 13:02:17 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,6 @@
 # define COLOR_EXEC "\033[31m"
 
 void	list_argument(t_stat *argstat, uint8_t flags);
-int	error(char *path);
+int		error(char *path);
 
 #endif

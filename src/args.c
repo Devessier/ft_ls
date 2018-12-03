@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 13:18:07 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 14:48:35 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,9 @@ int		append_entry(t_entries *entries, char *long_name, char *short_name, uint8_t
 {
 	t_stat	**tmp;
 	int		i;
-	int		(*f)(const char *path, struct stat *buf);
+	int		(*stat_fn)(const char *path, struct stat *buf);
 
-	f = watch_sym_link ? lstat : stat;
+	stat_fn = watch_sym_link ? lstat : stat;
 	if (entries->len + 1 >= entries->cap)
 	{
 		tmp = entries->stats;
@@ -85,7 +85,7 @@ int		append_entry(t_entries *entries, char *long_name, char *short_name, uint8_t
 	}
 	errno = 0;
 	if (!(entries->stats[entries->len] = (t_stat *)malloc(sizeof(t_stat)))
-		|| f(long_name, (struct stat *)entries->stats[entries->len]) != 0)
+		|| stat_fn(long_name, (struct stat *)entries->stats[entries->len]) != 0)
 		return (error(long_name));
 	entries->stats[entries->len]->d_name = long_name;
 	entries->stats[entries->len++]->d_shname = short_name;

@@ -6,14 +6,16 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 13:04:38 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/01 19:57:10 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 10:57:15 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <string.h>
+#include <sys/stat.h>
 #include "args.h"
+#include "sort.h"
 
-int	ft_strcmp(void *s1, void *s2)
+int		ft_strcmp(void *s1, void *s2)
 {
 	size_t		i;
 	char		*c_1;
@@ -27,9 +29,20 @@ int	ft_strcmp(void *s1, void *s2)
 	return ((unsigned char)c_1[i] - (unsigned char)c_2[i]);
 }
 
-int	ft_d_name_sort(void *d1, void *d2)
+int		args_sort(void *a1, void *a2)
 {
-	return (ft_strcmp((void *)(((t_stat *)d1)->d_name), (void *)(((t_stat *)d2)->d_name)));
+	const int	is_dir1 = S_ISDIR(((t_stat *)a1)->st_mode);
+	const int	is_dir2 = S_ISDIR(((t_stat *)a2)->st_mode);
+
+	if (is_dir1 != is_dir2)
+		return ((is_dir1 && !is_dir2) ? 1 : -1);
+	return (ft_d_name_sort(a1, a2));
+}
+
+int		ft_d_name_sort(void *d1, void *d2)
+{
+	return (ft_strcmp((void *)(((t_stat *)d1)->d_name),
+				(void *)(((t_stat *)d2)->d_name)));
 }
 
 void	swap(void **a, void **b)
@@ -41,12 +54,12 @@ void	swap(void **a, void **b)
 	*b = tmp;
 }
 
-void	quick_sort(void **list, int start, int end, int	(*f)(void *, void *))
+void	quick_sort(void **list, int start, int end, int (*f)(void*, void*))
 {
 	void	*key;
-	int	mid;
-	int	i;
-	int	j;
+	int		mid;
+	int		i;
+	int		j;
 
 	if (start < end)
 	{

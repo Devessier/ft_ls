@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/02 12:19:20 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 12:29:30 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,13 @@ uint8_t		parse_flags(char *flag)
 	return (flags);
 }
 
-int		append_entry(t_entries *entries, char *long_name, char *short_name)
+int		append_entry(t_entries *entries, char *long_name, char *short_name, uint8_t watch_sym_link)
 {
 	t_stat	**tmp;
-	int	i;
+	int		i;
+	int		(*f)(const char *path, struct stat *buf);
 
+	f = watch_sym_link ? lstat : stat;
 	if (entries->len + 1 >= entries->cap)
 	{
 		tmp = entries->stats;
@@ -79,7 +81,7 @@ int		append_entry(t_entries *entries, char *long_name, char *short_name)
 	}
 	errno = 0;
 	if (!(entries->stats[entries->len] = (t_stat *)malloc(sizeof(t_stat)))
-		|| stat(long_name, (struct stat *)entries->stats[entries->len]) != 0)
+		|| f(long_name, (struct stat *)entries->stats[entries->len]) != 0)
 		return (error(long_name));
 	entries->stats[entries->len]->d_name = long_name;
 	entries->stats[entries->len++]->d_shname = short_name;
@@ -90,7 +92,8 @@ t_entries	parse_args(int len, char **args)
 {
 	uint8_t		end_of_flags;
 	t_entries	arguments;
-	int		i;
+	int			i;
+	int			j;
 
 	arguments = (t_entries){ 0, 0, 0, NULL };
 	end_of_flags = 0;
@@ -104,14 +107,17 @@ t_entries	parse_args(int len, char **args)
 		i++;
 	}
 	if (!(len - i))
-		append_entry(&arguments, ".", ".");
+		append_entry(&arguments, ".", ".", 0);
 	else if (len - i > 1)
 		quick_sort((void **)args, i, len - 1, ft_strcmp);
+	j = i;
 	while (i < len)
 	{
 		normalize_argument(&args[i]);
-		append_entry(&arguments, args[i], args[i]);
+		append_entry(&arguments, args[i], args[i], 0);
 		i++;
 	}
+	if (len - j > 1)
+		quick_sort((void **)arguments.stats, j, len - 1, args_sort);
 	return (arguments);
 }

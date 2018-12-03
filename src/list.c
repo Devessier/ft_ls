@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/02 12:34:58 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 12:42:44 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,39 @@
 #include "utils.h"
 #include "args.h"
 #include "sort.h"
+#include "list.h"
+#include <sys/stat.h>
 
-int	error(char *path)
+int		error(char *path)
 {
 	ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno))	;
 	return (1);
 }
 
+char	*color_code(t_stat *stats)
+{
+	if (S_ISFIFO(stats->st_mode))
+		return (COLOR_FIFO);
+	if (S_ISCHR(stats->st_mode))
+		return (COLOR_CHR);
+	if (S_ISBLK(stats->st_mode))
+		return (COLOR_BLK);
+	if (S_ISDIR(stats->st_mode))
+		return (COLOR_DIR);
+	if (S_ISLNK(stats->st_mode))
+		return (COLOR_LNK);
+	if (S_ISSOCK(stats->st_mode))
+		return (COLOR_SOCK);
+	return (COLOR_RESET);
+}
+
 void	list_file(t_stat *stats, uint8_t flags)
 {
 	if (!(flags & FLAG_LONG_FORMAT))
-		ft_putf_fd(1, "%s\n", stats->d_shname);
+	{
+		ft_putf_fd(1, "%s%s" COLOR_RESET "\n", color_code(stats), stats->d_shname);
+		ft_putstr_fd(COLOR_RESET, 1);
+	}
 }
 
 void	free_stats(t_stat *stats)
@@ -56,11 +78,11 @@ void	list_dir(t_stat *stats, uint8_t flags, uint8_t print_name)
 	{
 		if (*d->d_name == '.' && !(flags & FLAG_INCLUDE_DOTS))
 			continue ;
-		if (append_entry(&entries, pathjoin(stats->d_name, d->d_name), strdup(d->d_name)))
+		if (append_entry(&entries, pathjoin(stats->d_name, d->d_name), strdup(d->d_name), 1))
 			return ;
 	}
 	if (entries.len > 1)
-		quick_sort((void **)entries.stats, 0, entries.len -1, ft_d_name_sort);
+		quick_sort((void **)entries.stats, 0, entries.len - 1, ft_d_name_sort);
 	i = 0;
 	while (i < entries.len)
 		list_file(entries.stats[i++], entries.flags);

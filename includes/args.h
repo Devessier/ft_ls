@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 13:02:39 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 14:40:01 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,42 +38,34 @@ typedef struct		s_entry
 
 typedef struct		s_stat
 {
-	dev_t		st_dev;
-	mode_t		st_mode;
-	nlink_t		st_nlink;
-	ino_t		st_ino;
-	uid_t		st_uid;
-	gid_t		st_gid;
-	dev_t		st_rdev;
+	dev_t			st_dev;
+	mode_t			st_mode;
+	nlink_t			st_nlink;
+	ino_t			st_ino;
+	uid_t			st_uid;
+	gid_t			st_gid;
+	dev_t			st_rdev;
 	struct timespec	st_atimespec;
 	struct timespec	st_mtimespec;
 	struct timespec	st_ctimespec;
 	struct timespec	st_birthtimespec;
-	off_t		st_size;
-	blkcnt_t	st_blocks;
-	blksize_t	st_blksize;
-	uint32_t	st_flags;
-	uint32_t	st_gen;
-	uint8_t		d_type;
-	char		*d_name;
-	char		*d_shname;
-}			t_stat;
-
-typedef struct		s_ls_args
-{
-	uint8_t	flags;
-	int	len;
-	int	cap;
-	t_stat	**stats;
-}			t_ls_args;
+	off_t			st_size;
+	blkcnt_t		st_blocks;
+	blksize_t		st_blksize;
+	uint32_t		st_flags;
+	uint32_t		st_gen;
+	uint8_t			d_type;
+	char			*d_name;
+	char			*d_shname;
+}					t_stat;
 
 typedef struct		s_entries
 {
 	uint8_t	flags;
-	int	cap;
-	int	len;
+	int		cap;
+	int		len;
 	t_stat	**stats;
-}			t_entries;
+}					t_entries;
 
 typedef struct		s_argument
 {
@@ -83,7 +75,8 @@ typedef struct		s_argument
 
 extern t_argument	g_arguments[];
 
-t_entries		parse_args(int len, char **args);
-int			append_entry(t_entries *entries, char *long_name, char *short_name, uint8_t watch_sym_link);
+t_entries			parse_args(int len, char **args);
+int					append_entry(t_entries *entries, char *long_name,
+		char *short_name, uint8_t watch_sym_link);
 
 #endif

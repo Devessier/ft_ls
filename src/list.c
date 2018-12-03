@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 13:13:18 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 14:52:36 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,16 +44,13 @@ char	*color_code(t_stat *stats, uint8_t flags)
 		return (COLOR_LNK);
 	if (S_ISSOCK(stats->st_mode))
 		return (COLOR_SOCK);
-	return (COLOR_RESET);
+	return ("");
 }
 
 void	list_file(t_stat *stats, uint8_t flags)
 {
 	if (!(flags & FLAG_LONG_FORMAT))
-	{
-		ft_putf_fd(1, "%s%s" COLOR_RESET "\n", color_code(stats, flags), stats->d_shname);
-		ft_putstr_fd(COLOR_RESET, 1);
-	}
+		ft_putf_fd(1, "%s%s%s\n", color_code(stats, flags), stats->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
 }
 
 void	free_stats(t_stat *stats)

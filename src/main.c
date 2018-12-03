@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 17:51:45 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 18:00:50 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ int	main(int len, char **args)
 	dir_args.flags = files_args.flags;
 	if (len == i)
 		append_entry(&dir_args, &dir_args, ".", ".", 0);
-	i = 0;
 	while (i < len)
 	{
 		normalize_argument(&args[i]);

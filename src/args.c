@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 14:48:35 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 17:52:24 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,74 +32,46 @@ t_argument	g_arguments[] =
 	{ 0, FLAG_NONE }
 };
 
-int		normalize_argument(char **str)
+int		append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_name, char *short_name, uint8_t watch_sym_link)
 {
-	int		i;
+	t_payload		**tmp;
+	int				i;
+	struct stat		stats;
+	t_entries		*entries;	
 
-	i = 0;
-	while ((*str)[i])
-		i++;
-	if (i)
-		i--;
-	while (i && (*str)[i] == '/')
-		(*str)[i--] = '\0';
-	return (i);
-}
-
-uint8_t		parse_flags(char *flag)
-{
-	uint8_t	flags;
-	uint8_t	i;
-
-	flags = FLAG_NONE;
-	while (*++flag)
-	{
-		i = 0;
-		while (g_arguments[i].c_flag)
-			if (g_arguments[i++].c_flag == *flag)
-				flags |= g_arguments[i - 1].flag;
-	}
-	if ((flags & FLAG_COLORS_ON) && !isatty(1))
-		flags ^= FLAG_COLORS_ON;
-	return (flags);
-}
-
-int		append_entry(t_entries *entries, char *long_name, char *short_name, uint8_t watch_sym_link)
-{
-	t_stat	**tmp;
-	int		i;
-	int		(*stat_fn)(const char *path, struct stat *buf);
-
-	stat_fn = watch_sym_link ? lstat : stat;
+	if ((watch_sym_link ? lstat : stat)(long_name, &stats) != 0)
+		return (error(long_name));
+	entries = S_ISDIR(stats.st_mode) ? dir_entries : files_entries;
 	if (entries->len + 1 >= entries->cap)
 	{
-		tmp = entries->stats;
+		tmp = entries->payloads;
 		entries->cap = !entries->cap ? 10 : entries->cap * 10;
-		if (!(entries->stats = (t_stat **)malloc(sizeof(t_stat *) * entries->cap)))
+		if (!(entries->payloads = (t_payload **)malloc(sizeof(t_payload *) * entries->cap)))
 			error(long_name);
 		i = -1;
 		while (++i < entries->len)
-			entries->stats[i] = tmp[i];
+			entries->payloads[i] = tmp[i];
 		if (tmp && entries->len)
 			free(tmp);
 	}
 	errno = 0;
-	if (!(entries->stats[entries->len] = (t_stat *)malloc(sizeof(t_stat)))
-		|| stat_fn(long_name, (struct stat *)entries->stats[entries->len]) != 0)
+	if (!(entries->payloads[entries->len] = (t_payload *)malloc(sizeof(t_payload))))
 		return (error(long_name));
-	entries->stats[entries->len]->d_name = long_name;
-	entries->stats[entries->len++]->d_shname = short_name;
+	entries->payloads[entries->len]->stats = stats;
+	entries->payloads[entries->len]->d_name = long_name;
+	entries->payloads[entries->len++]->d_shname = short_name;
 	return (0);
 }
 
-t_entries	parse_args(int len, char **args)
+/*void		parse_args(int len, char **args)
 {
 	uint8_t		end_of_flags;
-	t_entries	arguments;
+	t_entries	files_arguments;
+	t_entries	dir_arguments;
 	int			i;
-	int			j;
 
-	arguments = (t_entries) { isatty(1) ? FLAG_COLORS_ON : 0, 0, 0, NULL };
+	files_arguments = (t_entries) { isatty(1) ? FLAG_COLORS_ON : 0, 0, 0, NULL };
+	dir_arguments = (t_entries) { isatty(1) ? FLAG_COLORS_ON : 0, 0, 0, NULL };
 	end_of_flags = 0;
 	i = 0;
 	while (i < len && *args[i] == '-' && !end_of_flags)
@@ -107,21 +79,21 @@ t_entries	parse_args(int len, char **args)
 		if (args[i][1] == '-')
 			end_of_flags ^= 1;
 		else
-			arguments.flags |= parse_flags(args[i]);
+			files_arguments.flags |= parse_flags(args[i]);
 		i++;
 	}
+	dir_arguments.flags = files_arguments.flags;
 	if (!(len - i))
-		append_entry(&arguments, ".", ".", 0);
-	else if (len - i > 1)
-		quick_sort((void **)args, i, len - 1, ft_strcmp);
-	j = i;
+		append_entry(&dir_arguments, NULL, ".", ".", 0);
+	i = 0;
 	while (i < len)
 	{
 		normalize_argument(&args[i]);
-		append_entry(&arguments, args[i], args[i], 0);
+		append_entry(&files_arguments, &dir_arguments, args[i], args[i], 0);
 		i++;
 	}
-	if (len - j > 1)
-		quick_sort((void **)arguments.stats, j, len - 1, args_sort);
-	return (arguments);
-}
+	quick_sort((void **)files_arguments.stats, 0, files_arguments.len, args_sort, files_arguments.flags);
+	quick_sort((void **)dir_arguments.stats, 0, dir_arguments.len, args_sort, dir_arguments.flags);
+	print_entry(&files_arguments);
+	print_entry(&dir_arguments);
+}*/

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 13:04:38 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 10:57:15 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 17:46:31 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ int		ft_strcmp(void *s1, void *s2)
 
 int		args_sort(void *a1, void *a2)
 {
-	const int	is_dir1 = S_ISDIR(((t_stat *)a1)->st_mode);
-	const int	is_dir2 = S_ISDIR(((t_stat *)a2)->st_mode);
+	const int	is_dir1 = S_ISDIR(((t_payload *)a1)->stats.st_mode);
+	const int	is_dir2 = S_ISDIR(((t_payload *)a2)->stats.st_mode);
 
 	if (is_dir1 != is_dir2)
 		return ((is_dir1 && !is_dir2) ? 1 : -1);
@@ -41,8 +41,8 @@ int		args_sort(void *a1, void *a2)
 
 int		ft_d_name_sort(void *d1, void *d2)
 {
-	return (ft_strcmp((void *)(((t_stat *)d1)->d_name),
-				(void *)(((t_stat *)d2)->d_name)));
+	return (ft_strcmp((void *)(((t_payload *)d1)->d_name),
+				(void *)(((t_payload *)d2)->d_name)));
 }
 
 void	swap(void **a, void **b)
@@ -54,12 +54,13 @@ void	swap(void **a, void **b)
 	*b = tmp;
 }
 
-void	quick_sort(void **list, int start, int end, int (*f)(void*, void*))
+void	quick_sort(void **list, int start, int end, int (*f)(void*, void*), uint8_t flags)
 {
-	void	*key;
-	int		mid;
-	int		i;
-	int		j;
+	void			*key;
+	int				mid;
+	int				i;
+	int				j;
+	const uint8_t	reverse_order = flags & FLAG_REVERSE_SORT;
 
 	if (start < end)
 	{
@@ -70,15 +71,15 @@ void	quick_sort(void **list, int start, int end, int (*f)(void*, void*))
 		j = end;
 		while (i <= j)
 		{
-			while (i <= end && f(list[i], key) <= 0)
+			while (i <= end && (reverse_order ? f(list[i], key) > 0 : f(list[i], key) <= 0))
 				i++;
-			while (j >= start && f(list[j], key) > 0)
+			while (j >= start && (!reverse_order ? f(list[j], key) > 0 : f(list[j], key) <= 0))
 				j--;
 			if (i < j)
 				swap(list + i, list + j);
 		}
 		swap(list + start, list + j);
-		quick_sort(list, start, j - 1, f);
-		quick_sort(list, j + 1, end, f);
+		quick_sort(list, start, j - 1, f, flags);
+		quick_sort(list, j + 1, end, f, flags);
 	}
 }

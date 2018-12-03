@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 14:40:01 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/03 17:43:57 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # include <stdint.h>
 # include <dirent.h>
 # include <sys/stat.h>
+# include <pwd.h>
 
 typedef enum		e_flag
 {
@@ -59,12 +60,20 @@ typedef struct		s_stat
 	char			*d_shname;
 }					t_stat;
 
+typedef struct		s_payload
+{
+	struct stat		stats;
+	struct passwd	passwd;
+	char			*d_name;
+	char			*d_shname;
+}					t_payload;
+
 typedef struct		s_entries
 {
-	uint8_t	flags;
-	int		cap;
-	int		len;
-	t_stat	**stats;
+	uint8_t		flags;
+	int			cap;
+	int			len;
+	t_payload	**payloads;
 }					t_entries;
 
 typedef struct		s_argument
@@ -75,8 +84,8 @@ typedef struct		s_argument
 
 extern t_argument	g_arguments[];
 
-t_entries			parse_args(int len, char **args);
-int					append_entry(t_entries *entries, char *long_name,
+void				parse_args(int len, char **args);
+int					append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_name,
 		char *short_name, uint8_t watch_sym_link);
 
 #endif

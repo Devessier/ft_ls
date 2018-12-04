@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 17:43:57 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/04 13:44:07 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,38 +27,6 @@ typedef enum		e_flag
 	FLAG_SORT_TIME_MODIFIED = 1 << 4,
 	FLAG_COLORS_ON = 1 << 5
 }					t_flag;
-
-typedef struct		s_entry
-{
-	uint16_t	record_len;
-	uint16_t	name_len;
-	uint8_t		type;
-	char		name[1024];
-	struct stat	*stats;
-}					t_entry;
-
-typedef struct		s_stat
-{
-	dev_t			st_dev;
-	mode_t			st_mode;
-	nlink_t			st_nlink;
-	ino_t			st_ino;
-	uid_t			st_uid;
-	gid_t			st_gid;
-	dev_t			st_rdev;
-	struct timespec	st_atimespec;
-	struct timespec	st_mtimespec;
-	struct timespec	st_ctimespec;
-	struct timespec	st_birthtimespec;
-	off_t			st_size;
-	blkcnt_t		st_blocks;
-	blksize_t		st_blksize;
-	uint32_t		st_flags;
-	uint32_t		st_gen;
-	uint8_t			d_type;
-	char			*d_name;
-	char			*d_shname;
-}					t_stat;
 
 typedef struct		s_payload
 {

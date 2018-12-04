@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 17:46:17 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/04 16:23:45 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ int		error(char *path)
 char	*color_code(t_payload *payload, uint8_t flags)
 {
 	const mode_t	st_mode = payload->stats.st_mode;
+
 	if (!(flags & FLAG_COLORS_ON))
 		return ("");
 	if (S_ISFIFO(st_mode))
@@ -61,12 +62,13 @@ void	free_stats(t_payload *stats)
 	free(stats);
 }
 
-void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
+void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name, uint8_t recurse_dots)
 {
-	DIR		*directory;
-	t_entries	entries;
+	DIR				*directory;
+	t_entries		entries;
 	struct dirent	*d;
-	int		i;
+	int				i;
+	char			*short_name;
 
 	if (print_name)
 		ft_putf_fd(1, "\n%s:\n", stats->d_name);
@@ -89,24 +91,22 @@ void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
 	i = 0;
 	while ((flags & FLAG_RECURSIVE) && i < entries.len)
 	{
+		short_name = entries.payloads[i]->d_shname;
 		if (S_ISDIR(entries.payloads[i++]->stats.st_mode))
-		{
-			list_dir(entries.payloads[i - 1], flags, 1);
-			free_stats(entries.payloads[i - 1]);
-		}
-		else
-			free_stats(entries.payloads[i - 1]);
+			if (recurse_dots || (!recurse_dots && (ft_strcmp(".", short_name) && ft_strcmp("..", short_name))))
+				list_dir(entries.payloads[i - 1], flags, 1, 0);
+		free_stats(entries.payloads[i - 1]);
 	}
 	closedir(directory);
 	free(entries.payloads);
 }
 
-void	list_argument(t_payload *argstat, uint8_t flags)
+void	list_argument(t_payload *argstat, uint8_t flags, uint8_t print_name)
 {
 	if (!argstat->stats.st_mode)
 		return ;
 	if (S_ISDIR(argstat->stats.st_mode))
-		list_dir(argstat, flags, 0);
+		list_dir(argstat, flags, print_name, 1);
 	else
 		list_file(argstat, flags);
 }

@@ -6,12 +6,12 @@
 #    By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/06 16:01:17 by bdevessi          #+#    #+#              #
-#    Updated: 2018/12/03 17:52:54 by bdevessi         ###   ########.fr        #
+#    Updated: 2018/12/04 17:00:20 by bdevessi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ft_ls
-CFLAGS = -Wall -Werror -Wextra -Iincludes -O3
+CFLAGS = -Wall -Werror -Wextra -Iincludes
 CC = gcc
 
 include src.mk
@@ -23,7 +23,7 @@ all: $(NAME)
 $(OBJS): Makefile src.mk
 
 $(NAME): $(OBJS)
-	$(CC) -O3 -o $(NAME) $(OBJS)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
 
 clean:
 	rm -f $(OBJS)

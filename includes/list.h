@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 17:33:16 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/04 15:54:22 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 # define COLOR_SOCK "\033[32m"
 # define COLOR_EXEC "\033[31m"
 
-void	list_argument(t_payload *argstat, uint8_t flags);
+void	list_argument(t_payload *argstat, uint8_t flags, uint8_t print_name);
 int		error(char *path);
 
 #endif

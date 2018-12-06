@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/04 16:26:30 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/06 11:16:30 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,12 @@
 #include <unistd.h>
 #include "utils.h"
 #include "sort.h"
+#include <stdio.h>
 
-int		normalize_argument(char **str)
+char	*normalize_argument(char **str)
 {
-	int		i;
+	int			i;
+	const char	*start = *str;
 
 	i = 0;
 	while ((*str)[i])
@@ -30,7 +32,7 @@ int		normalize_argument(char **str)
 		i--;
 	while (i && (*str)[i] == '/')
 		(*str)[i--] = '\0';
-	return (i);
+	return ((char *)start);
 }
 
 uint8_t		parse_flags(char *flag)
@@ -58,9 +60,9 @@ void		print_entry(t_entries *entry, int total_args)
 	i = 0;
 	while (i < entry->len)
 	{
-		list_argument(entry->payloads[i], entry->flags, total_args > entry->len);
-		if (entry->len - i++ > 1 && S_ISDIR(entry->payloads[i]->stats.st_mode))
-			ft_putchar_fd('\n', 1);
+		if (S_ISDIR(entry->payloads[i]->stats.st_mode) && total_args > 1 && total_args >= entry->len)
+			ft_putf_fd(1, "%c%s:\n", (i && i < total_args) ? '\n' : 0 , entry->payloads[i]->d_name);
+		list_argument(entry->payloads[i++], entry->flags);
 	}
 }
 
@@ -89,16 +91,13 @@ int	main(int len, char **args)
 	if (len == i)
 		append_entry(&dir_args, &dir_args, ".", ".", 0);
 	total_args = len - i;
-	while (i < len)
-	{
-		normalize_argument(&args[i]);
-		append_entry(&dir_args, &files_args, args[i], args[i], 0);
-		i++;
-	}
-	if (files_args.len > 1)
-		quick_sort((void **)files_args.payloads, 0, files_args.len - 1, args_sort, files_args.flags);
-	if (dir_args.len > 1)
-		quick_sort((void **)dir_args.payloads, 0, dir_args.len - 1, args_sort, dir_args.flags);
+	quick_sort((void **)args, i, len - 1, ft_strcmp, flags);
+	while (++i <= len)
+		append_entry(&dir_args, &files_args, strdup(args[i - 1]), normalize_argument(&args[i - 1]), 0);
+	quick_sort((void **)files_args.payloads, 0, files_args.len - 1, args_sort, files_args.flags);
+	quick_sort((void **)dir_args.payloads, 0, dir_args.len - 1, args_sort, dir_args.flags);
 	print_entry(&files_args, total_args);
+	if (files_args.len && files_args.len < total_args)
+		ft_putchar_fd('\n', 1);
 	print_entry(&dir_args, total_args);
 }

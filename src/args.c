@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/04 14:28:40 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/06 10:21:19 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ int		append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_n
 		if (!(entries->payloads = (t_payload **)malloc(sizeof(t_payload *) * entries->cap)))
 			error(long_name);
 		i = -1;
-		while (++i < entries->len)
+		while (entries->payloads && ++i < entries->len)
 			entries->payloads[i] = tmp[i];
 		if (tmp && entries->len)
 			free(tmp);

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/04 16:23:45 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/06 11:22:42 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	free_stats(t_payload *stats)
 	free(stats);
 }
 
-void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name, uint8_t recurse_dots)
+void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
 {
 	DIR				*directory;
 	t_entries		entries;
@@ -93,20 +93,20 @@ void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name, uint8_t recur
 	{
 		short_name = entries.payloads[i]->d_shname;
 		if (S_ISDIR(entries.payloads[i++]->stats.st_mode))
-			if (recurse_dots || (!recurse_dots && (ft_strcmp(".", short_name) && ft_strcmp("..", short_name))))
-				list_dir(entries.payloads[i - 1], flags, 1, 0);
+			if (ft_strcmp(".", short_name) && ft_strcmp("..", short_name))
+				list_dir(entries.payloads[i - 1], flags, 1);
 		free_stats(entries.payloads[i - 1]);
 	}
 	closedir(directory);
 	free(entries.payloads);
 }
 
-void	list_argument(t_payload *argstat, uint8_t flags, uint8_t print_name)
+void	list_argument(t_payload *argstat, uint8_t flags)
 {
 	if (!argstat->stats.st_mode)
 		return ;
 	if (S_ISDIR(argstat->stats.st_mode))
-		list_dir(argstat, flags, print_name, 1);
+		list_dir(argstat, flags, 0);
 	else
 		list_file(argstat, flags);
 }

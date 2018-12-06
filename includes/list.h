@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/06 10:08:14 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/06 17:14:49 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,16 @@
 # define COLOR_SOCK "\033[32m"
 # define COLOR_EXEC "\033[31m"
 
-void	list_argument(t_payload *argstat, uint8_t flags);
-int		error(char *path);
+typedef struct	s_maxs
+{
+	unsigned int	links;
+	unsigned int	user;
+	unsigned int	group;
+	unsigned int	size;
+	unsigned int	blocks;
+}				t_maxs;
+
+void			list_argument(t_payload *argstat, uint8_t flags);
+int				error(char *path);
 
 #endif

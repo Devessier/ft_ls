@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/06 12:26:34 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/06 17:43:47 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,52 @@ char	*color_code(t_payload *payload, uint8_t flags)
 	return ("");
 }
 
-void	list_file(t_payload *payload, uint8_t flags)
+void	print_perms(mode_t perms)
+{
+	if (S_ISBLK(perms))
+		ft_putchar_fd('b', 1);
+	else if (S_ISCHR(perms))
+		ft_putchar_fd('c', 1);
+	else if (S_ISDIR(perms))
+		ft_putchar_fd('d', 1);
+	else if (S_ISLNK(perms))
+		ft_putchar_fd('l', 1);
+	else if (S_ISSOCK(perms))
+		ft_putchar_fd('s', 1);
+	else if (S_ISFIFO(perms))
+		ft_putchar_fd('p', 1);
+	else
+		ft_putchar_fd('-', 1);
+	ft_putchar_fd(perms & S_IRUSR ? 'r' : '-', 1);
+	ft_putchar_fd(perms & S_IWUSR ? 'w' : '-', 1);
+	ft_putchar_fd(perms & S_IXUSR ? 'x' : '-', 1);
+	ft_putchar_fd(perms & S_IRGRP ? 'r' : '-', 1);
+	ft_putchar_fd(perms & S_IWGRP ? 'w' : '-', 1);
+	ft_putchar_fd(perms & S_IXGRP ? 'x' : '-', 1);
+	ft_putchar_fd(perms & S_IROTH ? 'r' : '-', 1);
+	ft_putchar_fd(perms & S_IWOTH ? 'w' : '-', 1);
+	if (perms & S_ISVTX)
+		ft_putchar_fd(perms & S_IXUSR ? 't' : 'T', 1);
+	else
+		ft_putchar_fd('x', 1);
+	ft_putchar_fd(' ', 1);
+}
+
+void	long_format(t_payload *payload, uint8_t flags, t_maxs *maximums)
+{
+	(void)flags;
+	(void)maximums;
+	//printf("%d, %d, %d, %d, %d\n", maximums->links, maximums->user, maximums->group, maximums->size, maximums->blocks);
+	print_perms(payload->stats.st_mode);
+	ft_putchar_fd('\n', 1);
+}
+
+void	list_file(t_payload *payload, uint8_t flags, t_maxs *maximums)
 {
 	if (!(flags & FLAG_LONG_FORMAT))
 		ft_putf_fd(1, "%s%s%s\n", color_code(payload, flags), payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
+	else
+		long_format(payload, flags, maximums);
 }
 
 void	free_stats(t_payload *stats)
@@ -64,6 +106,14 @@ void	free_stats(t_payload *stats)
 	free(stats);
 }
 
+void	set_longer_string(unsigned int *size, char *str)
+{
+	const size_t	len = ft_strlen(str);
+
+	if (*size < len)
+		*size = len;
+}
+
 void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
 {
 	DIR				*directory;
@@ -71,25 +121,38 @@ void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
 	struct dirent	*d;
 	int				i;
 	char			*short_name;
+	t_maxs			maximums;
 
+	maximums = (t_maxs) { 0, 0, 0, 0, 0 };
 	if (print_name)
 		ft_putf_fd(1, "\n%s:\n", stats->d_name);
 	entries = (t_entries){ flags, 0, 0, NULL };
 	errno = 0;
 	if (!(directory = opendir(stats->d_name)))
 		return ((void)error(stats->d_name));
+	i = 0;
 	while ((d = readdir(directory)) != NULL)
 	{
 		if (*d->d_name == '.' && !(flags & FLAG_INCLUDE_DOTS))
 			continue ;
 		if (append_entry(&entries, &entries, pathjoin(stats->d_name, d->d_name), strdup(d->d_name), 1))
 			return ;
+		if (flags & FLAG_LONG_FORMAT)
+		{
+			if (entries.payloads[i]->stats.st_nlink > maximums.links)
+				maximums.links = entries.payloads[i]->stats.st_nlink;
+			if (entries.payloads[i]->stats.st_size > maximums.size)
+				maximums.size = entries.payloads[i]->stats.st_size;
+			set_longer_string(&maximums.user, entries.payloads[i]->passwd.pw_name);
+			set_longer_string(&maximums.group, entries.payloads[i]->group.gr_name);
+			maximums.blocks += entries.payloads[i++]->stats.st_blocks;
+		}
 	}
 	if (entries.len > 1)
 		quick_sort((void **)entries.payloads , 0, entries.len - 1, ft_d_name_sort, flags);
 	i = 0;
 	while (i < entries.len)
-		list_file(entries.payloads[i++], entries.flags);
+		list_file(entries.payloads[i++], entries.flags, &maximums);
 	i = 0;
 	while ((flags & FLAG_RECURSIVE) && i < entries.len)
 	{
@@ -110,5 +173,5 @@ void	list_argument(t_payload *argstat, uint8_t flags)
 	if (S_ISDIR(argstat->stats.st_mode))
 		list_dir(argstat, flags, 0);
 	else
-		list_file(argstat, flags);
+		list_file(argstat, flags, NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/06 10:21:19 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/06 13:17:36 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 #include "utils.h"
 #include "sort.h"
 #include <unistd.h>
+#include <pwd.h>
+#include <grp.h>
 
 t_argument	g_arguments[] =
 {
@@ -29,8 +31,25 @@ t_argument	g_arguments[] =
 	{ 'r', FLAG_REVERSE_SORT },
 	{ 't', FLAG_SORT_TIME_MODIFIED },
 	{ 'G', FLAG_COLORS_ON },
+	{ 'n', FLAG_NUMERIC },
 	{ 0, FLAG_NONE }
 };
+
+uint8_t	set_group_passwd(t_payload *payload)
+{
+	struct passwd	*passwd;
+	struct group	*group;
+
+	errno = 0;
+	if (!(passwd = getpwuid(payload->stats.st_uid)) && errno)
+		return (1);
+	errno = 0;
+	if (!(group = getgrgid(payload->stats.st_gid)) && errno)
+		return (1);
+	payload->passwd = *passwd;
+	payload->group = *group;
+	return (0);
+}
 
 int		append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_name, char *short_name, uint8_t watch_sym_link)
 {
@@ -38,6 +57,7 @@ int		append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_n
 	int				i;
 	struct stat		stats;
 	t_entries		*entries;
+
 
 	errno = 0;
 	if ((watch_sym_link ? lstat : stat)(long_name, &stats) != 0)
@@ -62,5 +82,7 @@ int		append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_n
 	entries->payloads[entries->len]->stats = stats;
 	entries->payloads[entries->len]->d_name = long_name;
 	entries->payloads[entries->len++]->d_shname = short_name;
+	if ((entries->flags & FLAG_LONG_FORMAT) && set_group_passwd(entries->payloads[entries->len - 1]))
+		return (error(long_name));
 	return (0);
 }

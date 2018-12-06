@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 13:04:38 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/03 17:46:31 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/06 12:45:46 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,24 +62,23 @@ void	quick_sort(void **list, int start, int end, int (*f)(void*, void*), uint8_t
 	int				j;
 	const uint8_t	reverse_order = flags & FLAG_REVERSE_SORT;
 
-	if (start < end)
+	if (!(start < end))
+		return ;
+	mid = (start + end) / 2;
+	swap(list + start, list + mid);
+	key = list[start];
+	i = start + 1;
+	j = end;
+	while (i <= j)
 	{
-		mid = (start + end) / 2;
-		swap(list + start, list + mid);
-		key = list[start];
-		i = start + 1;
-		j = end;
-		while (i <= j)
-		{
-			while (i <= end && (reverse_order ? f(list[i], key) > 0 : f(list[i], key) <= 0))
-				i++;
-			while (j >= start && (!reverse_order ? f(list[j], key) > 0 : f(list[j], key) <= 0))
-				j--;
-			if (i < j)
-				swap(list + i, list + j);
-		}
-		swap(list + start, list + j);
-		quick_sort(list, start, j - 1, f, flags);
-		quick_sort(list, j + 1, end, f, flags);
+		while (i <= end && (reverse_order ? f(list[i], key) > 0 : f(list[i], key) <= 0))
+			i++;
+		while (j >= start && (!reverse_order ? f(list[j], key) > 0 : f(list[j], key) <= 0))
+			j--;
+		if (i < j)
+			swap(list + i, list + j);
 	}
+	swap(list + start, list + j);
+	quick_sort(list, start, j - 1, f, flags);
+	quick_sort(list, j + 1, end, f, flags);
 }

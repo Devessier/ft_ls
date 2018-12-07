@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 14:57:05 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 15:28:15 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 16:36:50 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,8 @@ void		ft_putf_fd(int fd, const char *format, ...)
 
 void	ft_putstr_color_fd(char c, char *color, int fd, uint8_t flags)
 {
+	if (c == '-')
+		return (ft_putchar_fd('-', fd));
 	ft_putf_fd(fd, "%s%c%s", flags & FLAG_COLORS_ON ? color : ""
 			, c, flags & FLAG_COLORS_ON ? COLOR_RESET : "");
 }

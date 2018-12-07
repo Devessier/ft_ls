@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 16:49:34 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 16:56:56 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,9 +101,16 @@ void	print_file_mode(mode_t perms, uint8_t flags)
 
 void	long_format(t_payload *payload, uint8_t flags, t_maxs *maximums)
 {
-	(void)maximums;
-	printf("%d, %d, %d, %d, %d, %d, %d\n", maximums->links_len, maximums->size_len, maximums->links, maximums->user, maximums->group, maximums->size, maximums->blocks);
+	unsigned int	i;
+	
 	print_file_mode(payload->stats.st_mode, flags);
+	i = payload->stats.st_nlink;
+	while (i < maximums->links)
+	{
+		ft_putchar_fd(' ', 1);
+		i /= 10;
+	}
+	ft_putf_fd(1, "%d", payload->stats.st_nlink);
 	ft_putchar_fd('\n', 1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 14:57:05 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/06 16:11:51 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 15:28:15 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "list.h"
 
 size_t		ft_strlen(char *str)
 {
@@ -105,6 +106,12 @@ void		ft_putf_fd(int fd, const char *format, ...)
 			ft_putchar_fd(*format++, fd);
 	}
 	va_end(args);
+}
+
+void	ft_putstr_color_fd(char c, char *color, int fd, uint8_t flags)
+{
+	ft_putf_fd(fd, "%s%c%s", flags & FLAG_COLORS_ON ? color : ""
+			, c, flags & FLAG_COLORS_ON ? COLOR_RESET : "");
 }
 
 char	*pathjoin(char *s1, char *s2)

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 15:21:00 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 16:32:05 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include "sort.h"
 #include "list.h"
 #include <sys/stat.h>
+#include "utils.h"
 
 t_file_type	g_file_types[] = {
 	{ S_IFIFO, COLOR_FIFO, 'p' },
@@ -46,6 +47,10 @@ char	*color_code(t_payload *payload, uint8_t flags)
 
 	if (!(flags & FLAG_COLORS_ON))
 		return ("");
+	if (st_mode & S_ISUID && st_mode & S_AEXEC)
+		return (COLOR_UID);
+	if (st_mode & S_ISGID && st_mode & S_AEXEC)
+		return (COLOR_GID);
 	i = 0;
 	while (g_file_types[i].mode)
 		if ((st_mode & S_IFMT) == g_file_types[i++].mode
@@ -63,34 +68,32 @@ void	print_file_type(mode_t perms, uint8_t flags)
 	i = 0;
 	while (g_file_types[i].mode)
 		if ((perms & S_IFMT) == g_file_types[i++].mode)
-			ft_putf_fd(1, "%s%c%s",
-					flags & FLAG_COLORS_ON ? COLOR_FILE_TYPE : "",
-					g_file_types[i - 1].to_char,
-					flags & FLAG_COLORS_ON ? COLOR_RESET : "");
+			ft_putstr_color_fd(g_file_types[i - 1].to_char,
+					COLOR_FILE_TYPE, 1, flags);
 }
 
 void	print_file_mode(mode_t perms, uint8_t flags)
 {
-	int8_t	shift;
+	int8_t	sh;
 
 	print_file_type(perms, flags);
-	shift = 9;
-	while ((shift -= 3) >= 0)
+	sh = 9;
+	while ((sh -= 3) >= 0)
 	{
-		ft_putf_fd(1, "%s%c%s", flags & FLAG_COLORS_ON ? COLOR_READ : "", (perms & (4 << shift)) ? 'r' : '-', flags & FLAG_COLORS_ON ? COLOR_RESET : "");
-		ft_putf_fd(1, "%s%c%s", flags & FLAG_COLORS_ON ? COLOR_WRITE : "", (perms & (2 << shift)) ? 'w' : '-', flags & FLAG_COLORS_ON ? COLOR_RESET : "");
-		if (shift && ((!(perms & S_IXUSR) && (perms & S_ISUID))
-				|| (!(perms & S_IXGRP) && (perms & S_ISGID))))
-			ft_putchar_fd('S', 1);
-		else if (shift && (((perms & S_IXUSR) && (perms & S_ISUID))
-				|| ((perms & S_IXGRP) && (perms & S_ISGID))))
-			ft_putchar_fd('s', 1);
+		ft_putstr_color_fd((perms & 4 << sh) ? 'r' : '-', COLOR_READ, 1, flags);
+		ft_putstr_color_fd((perms & 2 << sh) ? 'w' : '-', COLOR_WRITE, 1, flags);
+		if (sh && ((sh == 6 && !(perms & S_IXUSR) && perms & S_ISUID)
+				|| (sh == 3 && !(perms & S_IXGRP) && perms & S_ISGID)))
+			ft_putstr_color_fd('S', COLOR_S , 1, flags);
+		else if (sh && ((sh == 6 && perms & S_IXUSR && perms & S_ISUID)
+				|| (perms & S_IXGRP && perms & S_ISGID)))
+			ft_putstr_color_fd('s', COLOR_S, 1, flags);
 		else
 		{
-			if (!shift && perms & S_ISVTX)
-				ft_putchar_fd(perms & (1 << shift) ? 't' : 'T', 1);
+			if (!sh && perms & S_ISVTX)
+				ft_putstr_color_fd(perms & 1 << sh ? 't' : 'T', COLOR_T, 1, flags);
 			else
-				ft_putf_fd(1, "%s%c%s", flags & FLAG_COLORS_ON ? COLOR_EXEC : "", (perms & (1 << shift)) ? 'x' : '-', flags & FLAG_COLORS_ON ? COLOR_RESET : "");
+				ft_putstr_color_fd(perms & 1 << sh ? 'x' : '-', COLOR_EXEC, 1, flags);
 		}
 	}
 }
@@ -162,6 +165,8 @@ void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
 	}
 	if (entries.len > 1)
 		quick_sort((void **)entries.payloads , 0, entries.len - 1, ft_d_name_sort, flags);
+	if (flags & FLAG_LONG_FORMAT)
+		ft_putf_fd(1, "total %d\n", maximums.blocks);
 	i = 0;
 	while (i < entries.len)
 		list_file(entries.payloads[i++], entries.flags, &maximums);

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 15:22:13 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 16:15:44 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,11 @@
 # define COLOR_READ "\033[32m"
 # define COLOR_WRITE "\033[38;2;255;127;80m"
 # define COLOR_FILE_TYPE "\033[38;2;63;127;191m"
+# define COLOR_S "\033[38;2;216;27;96m"
+# define COLOR_T "\033[38;2;255;241;118m"
+# define COLOR_UID "\033[30;101m"
+# define COLOR_GID "\033[30;106m"
+# define S_AEXEC (S_IXUSR | S_IXGRP | S_IXOTH)
 
 typedef struct		s_maxs
 {

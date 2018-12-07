@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 14:48:38 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 19:12:32 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ t_argument	g_arguments[] =
 	{ 0, FLAG_NONE }
 };
 
-uint8_t	set_group_passwd(t_payload *payload)
+uint8_t	set_group_passwd(t_payload *payload, uint8_t flags)
 {
 	struct passwd	*passwd;
 	struct group	*group;
@@ -46,8 +46,12 @@ uint8_t	set_group_passwd(t_payload *payload)
 	errno = 0;
 	if (!(group = getgrgid(payload->stats.st_gid)) && errno)
 		return (1);
-	payload->passwd = *passwd;
-	payload->group = *group;
+	if (!(payload->user = ((flags & FLAG_NUMERIC) || !passwd)
+		? ft_itoa(passwd->pw_uid) : ft_strdup(passwd->pw_name)))
+		return (1);
+	if (!(payload->group = ((flags & FLAG_NUMERIC) || !group)
+		? ft_itoa(group->gr_gid) : ft_strdup(group->gr_name)))
+		return (1);
 	return (0);
 }
 
@@ -83,7 +87,7 @@ int		append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_n
 	entries->payloads[entries->len]->stats = stats;
 	entries->payloads[entries->len]->d_name = long_name;
 	entries->payloads[entries->len++]->d_shname = short_name;
-	if ((entries->flags & FLAG_LONG_FORMAT) && set_group_passwd(entries->payloads[entries->len - 1]))
+	if ((entries->flags & FLAG_LONG_FORMAT) && set_group_passwd(entries->payloads[entries->len - 1], entries->flags))
 		return (error(long_name));
 	return (0);
 }

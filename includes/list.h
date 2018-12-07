@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 16:47:28 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 20:41:47 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,10 @@ typedef struct		s_maxs
 	unsigned int	group;
 	unsigned int	size;
 	unsigned int	size_len;
+	unsigned int	major;
+	unsigned int	major_len;
+	unsigned int	minor;
+	unsigned int	minor_len;
 	unsigned int	blocks;
 }					t_maxs;
 

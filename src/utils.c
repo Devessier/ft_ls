@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 14:57:05 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 16:46:04 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 19:07:53 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,19 +144,52 @@ char	*pathjoin(char *s1, char *s2)
 	return (str - i - j);
 }
 
-unsigned int	nb_len(int n)
+size_t		nb_len(int n)
 {
-	unsigned int	i;
-	unsigned int	pow;
+	size_t	i;
 
 	i = 1;
-	pow = 1;
-	if (n < 10)
-		return (1);
-	while (n / pow)
-	{
-		pow *= 10;
+	while (n /= 10)
 		i++;
+	return (i);
+}
+
+char		*ft_itoa(int n)
+{
+	char	*str;
+	long	pow;
+	int		len;
+	char	sign;
+
+	pow = 1;
+	len = 1;
+	sign = n < 0 ? -1 : 1;
+	while (n / (pow *= 10))
+		len++;
+	pow /= 10;
+	if (!(str = (char *)malloc(sizeof(char) * (len + (n < 0) + 1))))
+		return (NULL);
+	if (n < 0)
+		*str++ = '-';
+	while (pow)
+	{
+		*str++ = (n / pow % 10) * sign + '0';
+		pow /= 10;
 	}
-	return (--i);
+	*str = '\0';
+	return (str - (len + (n < 0)));
+}
+
+char	*ft_strdup(char *s1)
+{
+	char	*tmp;
+	char	*dest;
+
+	if (!(dest = (char *)malloc(sizeof(char) * (ft_strlen(s1) + 1))))
+		return (NULL);
+	tmp = dest;
+	while (*s1)
+		*dest++ = *s1++;
+	*dest = '\0';
+	return (tmp);
 }

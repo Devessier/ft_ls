@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/06 11:16:30 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 18:00:44 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ int	main(int len, char **args)
 	++args;
 	flags = isatty(1) ? FLAG_COLORS_ON : FLAG_NONE;
 	i = 0;
+	files_args = (t_entries) { 0, 0, 0, NULL };
+	dir_args = (t_entries) { 0, 0, 0, NULL };
 	while (i < len && *args[i] == '-')
 	{
 		if (args[i][1] == '-')

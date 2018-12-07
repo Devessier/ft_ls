@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 16:56:56 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 20:19:55 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include "list.h"
 #include <sys/stat.h>
 #include "utils.h"
+#include <sys/types.h>
 
 t_file_type	g_file_types[] = {
 	{ S_IFIFO, COLOR_FIFO, 'p' },
@@ -99,18 +100,35 @@ void	print_file_mode(mode_t perms, uint8_t flags)
 	ft_putstr_fd("  ", 1);
 }
 
+void	pad(ssize_t c)
+{
+	while (c--)
+		ft_putchar_fd(' ', 1);
+}
+
 void	long_format(t_payload *payload, uint8_t flags, t_maxs *maximums)
 {
-	unsigned int	i;
-	
+	const uint8_t	special_device = S_ISCHR(payload->stats.st_mode)
+		|| S_ISBLK(payload->stats.st_mode);
+
 	print_file_mode(payload->stats.st_mode, flags);
-	i = payload->stats.st_nlink;
-	while (i < maximums->links)
+	pad(maximums->links_len - nb_len(payload->stats.st_nlink));
+	ft_putf_fd(1, "%d ", payload->stats.st_nlink);
+	ft_putstr_fd(payload->user, 1);
+	pad(maximums->user - ft_strlen(payload->user) + 2);
+	ft_putf_fd(1, "%s  ", payload->group);
+	pad(maximums->group - ft_strlen(payload->group));
+	pad(special_device ?
+		maximums->major_len - nb_len(major(payload->stats.st_rdev))
+		: maximums->size_len - nb_len(payload->stats.st_size));
+	if (special_device)
 	{
-		ft_putchar_fd(' ', 1);
-		i /= 10;
+		ft_putf_fd(1, "%d, ", major(payload->stats.st_rdev));
+		pad(maximums->minor_len - nb_len(minor(payload->stats.st_rdev)));
+		ft_putf_fd(1, "%d ", minor(payload->stats.st_rdev));
 	}
-	ft_putf_fd(1, "%d", payload->stats.st_nlink);
+	else
+		ft_putf_fd(1, "%d  ", payload->stats.st_size);
 	ft_putchar_fd('\n', 1);
 }
 
@@ -133,8 +151,19 @@ void	set_longer_string(unsigned int *size, char *str)
 {
 	const size_t	len = ft_strlen(str);
 
-	if (*size < len)
+	if (len > *size)
 		*size = len;
+}
+
+void	set_major_minor(t_maxs *maximums, dev_t st_rdev)
+{
+	const unsigned int	major = major(st_rdev);
+	const unsigned int	minor = minor(st_rdev);
+
+	if (maximums->major < major)
+		maximums->major = major;
+	if (maximums->minor < minor)
+		maximums->minor = minor;
 }
 
 void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
@@ -146,7 +175,7 @@ void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
 	char			*short_name;
 	t_maxs			maximums;
 
-	maximums = (t_maxs) { 0, 0, 0, 0, 0, 0, 0 };
+	maximums = (t_maxs) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	if (print_name)
 		ft_putf_fd(1, "\n%s:\n", stats->d_name);
 	entries = (t_entries){ flags, 0, 0, NULL };
@@ -166,13 +195,16 @@ void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
 				maximums.links = entries.payloads[i]->stats.st_nlink;
 			if (entries.payloads[i]->stats.st_size > maximums.size)
 				maximums.size = entries.payloads[i]->stats.st_size;
-			set_longer_string(&maximums.user, entries.payloads[i]->passwd.pw_name);
-			set_longer_string(&maximums.group, entries.payloads[i]->group.gr_name);
-			maximums.blocks += entries.payloads[i++]->stats.st_blocks;
+			set_longer_string(&(maximums.user), entries.payloads[i]->user);
+			set_longer_string(&(maximums.group), entries.payloads[i]->group);
+			maximums.blocks += entries.payloads[i]->stats.st_blocks;
+			set_major_minor(&maximums, entries.payloads[i++]->stats.st_rdev);
 		}
 	}
 	maximums.links_len = nb_len(maximums.links);
 	maximums.size_len = nb_len(maximums.size);
+	maximums.major_len = nb_len(maximums.major);
+	maximums.minor_len = nb_len(maximums.minor);
 	if (entries.len > 1)
 		quick_sort((void **)entries.payloads , 0, entries.len - 1, ft_d_name_sort, flags);
 	if (flags & FLAG_LONG_FORMAT)

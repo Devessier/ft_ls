@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/06 13:11:28 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 19:33:53 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,16 @@ typedef enum		e_flag
 	FLAG_REVERSE_SORT = 1 << 3,
 	FLAG_SORT_TIME_MODIFIED = 1 << 4,
 	FLAG_COLORS_ON = 1 << 5,
-	FLAG_NUMERIC = 1 << 6 | 1
+	FLAG_NUMERIC = 1 << 6
 }					t_flag;
 
 typedef struct		s_payload
 {
-	struct stat		stats;
-	struct passwd	passwd;
-	struct group	group;
-	char			*d_name;
-	char			*d_shname;
+	struct stat	stats;
+	char		*user;
+	char		*group;
+	char		*d_name;
+	char		*d_shname;
 }					t_payload;
 
 typedef struct		s_entries

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/06 13:17:36 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 14:48:38 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ uint8_t	set_group_passwd(t_payload *payload)
 
 int		append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_name, char *short_name, uint8_t watch_sym_link)
 {
+	(void)watch_sym_link;
 	t_payload		**tmp;
 	int				i;
 	struct stat		stats;
@@ -60,7 +61,7 @@ int		append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_n
 
 
 	errno = 0;
-	if ((watch_sym_link ? lstat : stat)(long_name, &stats) != 0)
+	if (lstat(long_name, &stats) != 0)
 		return (error(long_name));
 	entries = S_ISDIR(stats.st_mode) ? dir_entries : files_entries;
 	if (entries->len + 1 >= entries->cap)

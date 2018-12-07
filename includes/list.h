@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/06 17:14:49 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 14:45:09 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,17 +23,27 @@
 # define COLOR_LNK "\033[35m"
 # define COLOR_SOCK "\033[32m"
 # define COLOR_EXEC "\033[31m"
+# define COLOR_READ "\033[32m"
+# define COLOR_WRITE "\033[38;2;255;127;80m"
 
-typedef struct	s_maxs
+typedef struct		s_maxs
 {
 	unsigned int	links;
 	unsigned int	user;
 	unsigned int	group;
 	unsigned int	size;
 	unsigned int	blocks;
-}				t_maxs;
+}					t_maxs;
 
-void			list_argument(t_payload *argstat, uint8_t flags);
-int				error(char *path);
+typedef struct		s_file_type
+{
+	uint32_t	mode;
+	char		*color;
+	char		to_char;
+}					t_file_type;
+
+void				list_argument(t_payload *argstat, uint8_t flags);
+int					error(char *path);
+extern t_file_type	g_file_types[];
 
 #endif

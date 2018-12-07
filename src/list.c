@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/06 17:43:47 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 14:48:04 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,17 @@
 #include "list.h"
 #include <sys/stat.h>
 
+t_file_type	g_file_types[] = {
+	{ S_IFIFO, COLOR_FIFO, 'p' },
+	{ S_IFCHR, COLOR_CHR, 'c' },
+	{ S_IFBLK, COLOR_BLK , 'b' },
+	{ S_IFDIR, COLOR_DIR, 'd' },
+	{ S_IFLNK, COLOR_LNK, 'l' },
+	{ S_IFSOCK, COLOR_SOCK, 's' },
+	{ S_IFREG, "" , '-' },
+	{ 0, NULL, 0 }
+};
+
 int		error(char *path)
 {
 	ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno))	;
@@ -31,63 +42,64 @@ int		error(char *path)
 char	*color_code(t_payload *payload, uint8_t flags)
 {
 	const mode_t	st_mode = payload->stats.st_mode;
+	uint8_t			i;
 
 	if (!(flags & FLAG_COLORS_ON))
 		return ("");
-	if (S_ISFIFO(st_mode))
-		return (COLOR_FIFO);
-	if (S_ISCHR(st_mode))
-		return (COLOR_CHR);
-	if (S_ISBLK(st_mode))
-		return (COLOR_BLK);
-	if (S_ISDIR(st_mode))
-		return (COLOR_DIR);
-	if (S_ISLNK(st_mode))
-		return (COLOR_LNK);
-	if (S_ISSOCK(st_mode))
-		return (COLOR_SOCK);
+	i = 0;
+	while (g_file_types[i].mode)
+		if ((st_mode & S_IFMT) == g_file_types[i++].mode
+				&& *g_file_types[i - 1].color)
+			return (g_file_types[i - 1].color);
 	if (st_mode & S_IXUSR)
 		return (COLOR_EXEC);
 	return ("");
 }
 
-void	print_perms(mode_t perms)
+void	print_perms(mode_t perms, uint8_t flags)
 {
-	if (S_ISBLK(perms))
-		ft_putchar_fd('b', 1);
-	else if (S_ISCHR(perms))
-		ft_putchar_fd('c', 1);
-	else if (S_ISDIR(perms))
-		ft_putchar_fd('d', 1);
-	else if (S_ISLNK(perms))
-		ft_putchar_fd('l', 1);
-	else if (S_ISSOCK(perms))
-		ft_putchar_fd('s', 1);
-	else if (S_ISFIFO(perms))
-		ft_putchar_fd('p', 1);
-	else
-		ft_putchar_fd('-', 1);
-	ft_putchar_fd(perms & S_IRUSR ? 'r' : '-', 1);
-	ft_putchar_fd(perms & S_IWUSR ? 'w' : '-', 1);
-	ft_putchar_fd(perms & S_IXUSR ? 'x' : '-', 1);
-	ft_putchar_fd(perms & S_IRGRP ? 'r' : '-', 1);
-	ft_putchar_fd(perms & S_IWGRP ? 'w' : '-', 1);
-	ft_putchar_fd(perms & S_IXGRP ? 'x' : '-', 1);
-	ft_putchar_fd(perms & S_IROTH ? 'r' : '-', 1);
-	ft_putchar_fd(perms & S_IWOTH ? 'w' : '-', 1);
-	if (perms & S_ISVTX)
-		ft_putchar_fd(perms & S_IXUSR ? 't' : 'T', 1);
-	else
-		ft_putchar_fd('x', 1);
-	ft_putchar_fd(' ', 1);
+	uint8_t	i;
+
+	i = 0;
+	while (g_file_types[i].mode)
+		if ((perms & S_IFMT) == g_file_types[i++].mode)
+			ft_putf_fd(1, "%s%c%s",
+					flags & FLAG_COLORS_ON ? g_file_types[i - 1].color : "",
+					g_file_types[i - 1].to_char,
+					flags & FLAG_COLORS_ON ? COLOR_RESET : "");
+}
+
+void	print_file_mode(mode_t perms, uint8_t flags)
+{
+	int8_t	shift;
+
+	print_perms(perms, flags);
+	shift = 9;
+	while ((shift -= 3) >= 0)
+	{
+		ft_putf_fd(1, "%s%c%s", flags & FLAG_COLORS_ON ? COLOR_READ : "", (perms & (4 << shift)) ? 'r' : '-', flags & FLAG_COLORS_ON ? COLOR_RESET : "");
+		ft_putf_fd(1, "%s%c%s", flags & FLAG_COLORS_ON ? COLOR_WRITE : "", (perms & (2 << shift)) ? 'w' : '-', flags & FLAG_COLORS_ON ? COLOR_RESET : "");
+		if (shift && ((!(perms & S_IXUSR) && (perms & S_ISUID))
+				|| (!(perms & S_IXGRP) && (perms & S_ISGID))))
+			ft_putchar_fd('S', 1);
+		else if (shift && (((perms & S_IXUSR) && (perms & S_ISUID))
+				|| ((perms & S_IXGRP) && (perms & S_ISGID))))
+			ft_putchar_fd('s', 1);
+		else
+		{
+			if (!shift && perms & S_ISVTX)
+				ft_putchar_fd(perms & (1 << shift) ? 't' : 'T', 1);
+			else
+				ft_putf_fd(1, "%s%c%s", flags & FLAG_COLORS_ON ? COLOR_EXEC : "", (perms & (1 << shift)) ? 'x' : '-', flags & FLAG_COLORS_ON ? COLOR_RESET : "");
+		}
+	}
 }
 
 void	long_format(t_payload *payload, uint8_t flags, t_maxs *maximums)
 {
-	(void)flags;
 	(void)maximums;
 	//printf("%d, %d, %d, %d, %d\n", maximums->links, maximums->user, maximums->group, maximums->size, maximums->blocks);
-	print_perms(payload->stats.st_mode);
+	print_file_mode(payload->stats.st_mode, flags);
 	ft_putchar_fd('\n', 1);
 }
 

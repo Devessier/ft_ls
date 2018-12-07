@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 16:32:05 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 16:49:34 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,12 +96,13 @@ void	print_file_mode(mode_t perms, uint8_t flags)
 				ft_putstr_color_fd(perms & 1 << sh ? 'x' : '-', COLOR_EXEC, 1, flags);
 		}
 	}
+	ft_putstr_fd("  ", 1);
 }
 
 void	long_format(t_payload *payload, uint8_t flags, t_maxs *maximums)
 {
 	(void)maximums;
-	//printf("%d, %d, %d, %d, %d\n", maximums->links, maximums->user, maximums->group, maximums->size, maximums->blocks);
+	printf("%d, %d, %d, %d, %d, %d, %d\n", maximums->links_len, maximums->size_len, maximums->links, maximums->user, maximums->group, maximums->size, maximums->blocks);
 	print_file_mode(payload->stats.st_mode, flags);
 	ft_putchar_fd('\n', 1);
 }
@@ -138,7 +139,7 @@ void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
 	char			*short_name;
 	t_maxs			maximums;
 
-	maximums = (t_maxs) { 0, 0, 0, 0, 0 };
+	maximums = (t_maxs) { 0, 0, 0, 0, 0, 0, 0 };
 	if (print_name)
 		ft_putf_fd(1, "\n%s:\n", stats->d_name);
 	entries = (t_entries){ flags, 0, 0, NULL };
@@ -163,6 +164,8 @@ void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
 			maximums.blocks += entries.payloads[i++]->stats.st_blocks;
 		}
 	}
+	maximums.links_len = nb_len(maximums.links);
+	maximums.size_len = nb_len(maximums.size);
 	if (entries.len > 1)
 		quick_sort((void **)entries.payloads , 0, entries.len - 1, ft_d_name_sort, flags);
 	if (flags & FLAG_LONG_FORMAT)

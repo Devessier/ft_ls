@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 14:57:05 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 16:36:50 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 16:46:04 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ unsigned int	nb_len(int n)
 	unsigned int	i;
 	unsigned int	pow;
 
-	i = 0;
+	i = 1;
 	pow = 1;
 	if (n < 10)
 		return (1);

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 16:15:44 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 16:47:28 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,11 @@
 typedef struct		s_maxs
 {
 	unsigned int	links;
+	unsigned int	links_len;
 	unsigned int	user;
 	unsigned int	group;
 	unsigned int	size;
+	unsigned int	size_len;
 	unsigned int	blocks;
 }					t_maxs;
 

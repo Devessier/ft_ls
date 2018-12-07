@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 14:48:04 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/07 15:21:00 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ char	*color_code(t_payload *payload, uint8_t flags)
 	return ("");
 }
 
-void	print_perms(mode_t perms, uint8_t flags)
+void	print_file_type(mode_t perms, uint8_t flags)
 {
 	uint8_t	i;
 
@@ -64,7 +64,7 @@ void	print_perms(mode_t perms, uint8_t flags)
 	while (g_file_types[i].mode)
 		if ((perms & S_IFMT) == g_file_types[i++].mode)
 			ft_putf_fd(1, "%s%c%s",
-					flags & FLAG_COLORS_ON ? g_file_types[i - 1].color : "",
+					flags & FLAG_COLORS_ON ? COLOR_FILE_TYPE : "",
 					g_file_types[i - 1].to_char,
 					flags & FLAG_COLORS_ON ? COLOR_RESET : "");
 }
@@ -73,7 +73,7 @@ void	print_file_mode(mode_t perms, uint8_t flags)
 {
 	int8_t	shift;
 
-	print_perms(perms, flags);
+	print_file_type(perms, flags);
 	shift = 9;
 	while ((shift -= 3) >= 0)
 	{

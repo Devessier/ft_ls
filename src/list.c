@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 20:19:55 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/08 12:18:50 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,13 +119,13 @@ void	long_format(t_payload *payload, uint8_t flags, t_maxs *maximums)
 	ft_putf_fd(1, "%s  ", payload->group);
 	pad(maximums->group - ft_strlen(payload->group));
 	pad(special_device ?
-		maximums->major_len - nb_len(major(payload->stats.st_rdev))
+		maximums->major_len - nb_len(payload->stats.st_rdev >> 24)
 		: maximums->size_len - nb_len(payload->stats.st_size));
 	if (special_device)
 	{
-		ft_putf_fd(1, "%d, ", major(payload->stats.st_rdev));
-		pad(maximums->minor_len - nb_len(minor(payload->stats.st_rdev)));
-		ft_putf_fd(1, "%d ", minor(payload->stats.st_rdev));
+		ft_putf_fd(1, "%d, ", payload->stats.st_rdev >> 24);
+		pad(maximums->minor_len - nb_len(payload->stats.st_rdev & 0xFF));
+		ft_putf_fd(1, "%d ", payload->stats.st_rdev & 0xFF);
 	}
 	else
 		ft_putf_fd(1, "%d  ", payload->stats.st_size);
@@ -157,8 +157,8 @@ void	set_longer_string(unsigned int *size, char *str)
 
 void	set_major_minor(t_maxs *maximums, dev_t st_rdev)
 {
-	const unsigned int	major = major(st_rdev);
-	const unsigned int	minor = minor(st_rdev);
+	const unsigned int	major = st_rdev >> 24;
+	const unsigned int	minor = st_rdev & 0xFF;
 
 	if (maximums->major < major)
 		maximums->major = major;

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 20:41:47 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 14:38:44 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 # define COLOR_UID "\033[30;101m"
 # define COLOR_GID "\033[30;106m"
 # define S_AEXEC (S_IXUSR | S_IXGRP | S_IXOTH)
+# define MONTH 3600 * 24 * 30.5
 
 typedef struct		s_maxs
 {

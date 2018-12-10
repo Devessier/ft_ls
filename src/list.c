@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/08 12:18:50 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 15:08:31 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 #include <sys/stat.h>
 #include "utils.h"
 #include <sys/types.h>
+#include <time.h>
+#include <unistd.h>
 
 t_file_type	g_file_types[] = {
 	{ S_IFIFO, COLOR_FIFO, 'p' },
@@ -106,6 +108,27 @@ void	pad(ssize_t c)
 		ft_putchar_fd(' ', 1);
 }
 
+void	print_date(const time_t *timestamp)
+{
+	const	time_t	now = time(NULL);
+	const 	time_t	diff = *timestamp > now ? *timestamp - now : now - *timestamp;
+	char	*date = ctime(timestamp);
+
+	if (diff >= 6 * MONTH)
+	{
+		write(1, date + 4, 7);
+		write(1, date + 19, 5);
+	}
+	else
+		write(1, date + 4, 12);
+	write(1, " ", 1);
+}
+
+void	print_color_file(t_payload *payload, uint8_t flags)
+{
+		ft_putf_fd(1, "%s%s%s\n", color_code(payload, flags), payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
+}
+
 void	long_format(t_payload *payload, uint8_t flags, t_maxs *maximums)
 {
 	const uint8_t	special_device = S_ISCHR(payload->stats.st_mode)
@@ -128,14 +151,19 @@ void	long_format(t_payload *payload, uint8_t flags, t_maxs *maximums)
 		ft_putf_fd(1, "%d ", payload->stats.st_rdev & 0xFF);
 	}
 	else
-		ft_putf_fd(1, "%d  ", payload->stats.st_size);
-	ft_putchar_fd('\n', 1);
+	{
+		if (maximums->major || maximums->minor)
+			pad(maximums->major_len + maximums->minor_len + 1);
+		ft_putf_fd(1, "%d ", payload->stats.st_size);
+	}
+	print_date(&payload->stats.st_mtimespec.tv_sec);
+	print_color_file(payload, flags);
 }
 
 void	list_file(t_payload *payload, uint8_t flags, t_maxs *maximums)
 {
 	if (!(flags & FLAG_LONG_FORMAT))
-		ft_putf_fd(1, "%s%s%s\n", color_code(payload, flags), payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
+		print_color_file(payload, flags);
 	else
 		long_format(payload, flags, maximums);
 }

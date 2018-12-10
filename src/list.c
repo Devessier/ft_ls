@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:38:46 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 17:29:23 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -259,7 +259,7 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 	if (entries.len > 1)
 		quick_sort((void **)entries.payloads , 0, entries.len - 1, ft_d_name_sort, flags);
 	if (flags & FLAG_LONG_FORMAT)
-		ft_putf_fd(1, "total %d\n", maximums.blocks);
+		ft_putf_fd(1, "\033[4;34m" "total %d\n" COLOR_RESET, maximums.blocks);
 	i = 0;
 	while (i < entries.len)
 		list_file(entries.payloads[i++], entries.flags, &maximums);

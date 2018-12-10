@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 19:12:32 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:09:18 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,17 +25,19 @@
 
 t_argument	g_arguments[] =
 {
-	{ 'l', FLAG_LONG_FORMAT },
-	{ 'R', FLAG_RECURSIVE },
 	{ 'a', FLAG_INCLUDE_DOTS },
+	{ 'l', FLAG_LONG_FORMAT },
+	{ 'n', FLAG_NUMERIC },
 	{ 'r', FLAG_REVERSE_SORT },
 	{ 't', FLAG_SORT_TIME_MODIFIED },
+	{ 'u', FLAG_LAST_ACCESS },
 	{ 'G', FLAG_COLORS_ON },
-	{ 'n', FLAG_NUMERIC },
+	{ 'R', FLAG_RECURSIVE },
+	{ 'U', FLAG_CREATION },
 	{ 0, FLAG_NONE }
 };
 
-uint8_t	set_group_passwd(t_payload *payload, uint8_t flags)
+uint8_t	set_group_passwd(t_payload *payload, t_uflag flags)
 {
 	struct passwd	*passwd;
 	struct group	*group;

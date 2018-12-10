@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 15:25:52 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:03:56 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 #include "utils.h"
 #include "sort.h"
 #include <stdio.h>
-#include <stdlib.h>
 
 char	*normalize_argument(char **str)
 {
@@ -36,16 +35,16 @@ char	*normalize_argument(char **str)
 	return ((char *)start);
 }
 
-uint8_t		parse_flags(char *flag)
+t_uflag	parse_flags(char *flag)
 {
-	uint8_t	flags;
-	uint8_t	i;
-	uint8_t	found;
+	t_uflag	flags;
+	t_uflag	i;
+	t_uflag found;
 
 	flags = FLAG_NONE;
-	found = 0;
 	while (*++flag)
 	{
+		found = 0;
 		i = 0;
 		while (g_arguments[i].c_flag)
 			if (g_arguments[i++].c_flag == *flag)
@@ -54,10 +53,7 @@ uint8_t		parse_flags(char *flag)
 				found = 1;
 			}
 		if (!found)
-		{
 			usage(*flag);
-			exit(1);
-		}
 	}
 	if ((flags & FLAG_COLORS_ON) && !isatty(1))
 		flags ^= FLAG_COLORS_ON;
@@ -82,7 +78,7 @@ int	main(int len, char **args)
 	t_entries	files_args;
 	t_entries	dir_args;
 	int			i;
-	uint8_t		flags;
+	t_uflag		flags;
 	int			total_args;
 
 	--len;

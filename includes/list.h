@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 15:20:02 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:04:16 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ typedef struct		s_file_type
 	char		to_char;
 }					t_file_type;
 
-void				list_argument(t_payload *argstat, uint8_t flags);
+void				list_argument(t_payload *argstat, t_uflag flags);
 int					error(char *path);
 void				usage(char c);
 extern t_file_type	g_file_types[];

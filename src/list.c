@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 15:28:01 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:05:54 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,10 @@ void	usage(char c)
 	while (g_arguments[i].c_flag)
 		ft_putchar_fd(g_arguments[i++].c_flag, 2);
 	ft_putstr_fd("] [file ...]\n", 2);
+	exit(1);
 }
 
-char	*color_code(t_payload *payload, uint8_t flags)
+char	*color_code(t_payload *payload, t_uflag flags)
 {
 	const mode_t	st_mode = payload->stats.st_mode;
 	uint8_t			i;
@@ -76,7 +77,7 @@ char	*color_code(t_payload *payload, uint8_t flags)
 	return ("");
 }
 
-void	print_file_type(mode_t perms, uint8_t flags)
+void	print_file_type(mode_t perms, t_uflag flags)
 {
 	uint8_t	i;
 
@@ -87,7 +88,7 @@ void	print_file_type(mode_t perms, uint8_t flags)
 					COLOR_FILE_TYPE, 1, flags);
 }
 
-void	print_file_mode(mode_t perms, uint8_t flags)
+void	print_file_mode(mode_t perms, t_uflag flags)
 {
 	int8_t	sh;
 
@@ -136,14 +137,14 @@ void	print_date(const time_t *timestamp)
 	write(1, " ", 1);
 }
 
-void	print_color_file(t_payload *payload, uint8_t flags)
+void	print_color_file(t_payload *payload, t_uflag flags)
 {
 		ft_putf_fd(1, "%s%s%s\n", color_code(payload, flags), payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
 }
 
-void	long_format(t_payload *payload, uint8_t flags, t_maxs *maximums)
+void	long_format(t_payload *payload, t_uflag flags, t_maxs *maximums)
 {
-	const uint8_t	special_device = S_ISCHR(payload->stats.st_mode)
+	const t_uflag	special_device = S_ISCHR(payload->stats.st_mode)
 		|| S_ISBLK(payload->stats.st_mode);
 
 	print_file_mode(payload->stats.st_mode, flags);
@@ -172,7 +173,7 @@ void	long_format(t_payload *payload, uint8_t flags, t_maxs *maximums)
 	print_color_file(payload, flags);
 }
 
-void	list_file(t_payload *payload, uint8_t flags, t_maxs *maximums)
+void	list_file(t_payload *payload, t_uflag flags, t_maxs *maximums)
 {
 	if (!(flags & FLAG_LONG_FORMAT))
 		print_color_file(payload, flags);
@@ -206,7 +207,7 @@ void	set_major_minor(t_maxs *maximums, dev_t st_rdev)
 		maximums->minor = minor;
 }
 
-void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
+void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 {
 	DIR				*directory;
 	t_entries		entries;
@@ -265,7 +266,7 @@ void	list_dir(t_payload *stats, uint8_t flags, uint8_t print_name)
 	free(entries.payloads);
 }
 
-void	list_argument(t_payload *argstat, uint8_t flags)
+void	list_argument(t_payload *argstat, t_uflag flags)
 {
 	if (!argstat->stats.st_mode)
 		return ;

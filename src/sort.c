@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 13:04:38 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 13:57:40 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:06:29 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,13 +54,13 @@ void	swap(void **a, void **b)
 	*b = tmp;
 }
 
-void	quick_sort(void **list, int start, int end, int (*f)(void*, void*), uint8_t flags)
+void	quick_sort(void **list, int start, int end, int (*f)(void*, void*), t_uflag flags)
 {
 	void			*key;
 	int				mid;
 	int				i;
 	int				j;
-	const uint8_t	reverse_order = flags & FLAG_REVERSE_SORT;
+	const t_uflag	reverse_order = flags & FLAG_REVERSE_SORT;
 
 	if (!(start < end))
 		return ;

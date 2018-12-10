@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:32:16 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 22:23:19 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,17 +43,19 @@ uint8_t	set_group_passwd(t_payload *payload, t_uflag flags)
 	struct passwd	*passwd;
 	struct group	*group;
 
+	passwd = NULL;
+	group = NULL;
 	errno = 0;
 	if (!(passwd = getpwuid(payload->stats.st_uid)) && errno)
-		return (1);
+		return (error(payload->d_name));
 	errno = 0;
 	if (!(group = getgrgid(payload->stats.st_gid)) && errno)
-		return (1);
+		return (error(payload->d_name));
 	if (!(payload->user = ((flags & FLAG_NUMERIC) || !passwd)
-		? ft_itoa(passwd->pw_uid) : ft_strdup(passwd->pw_name)))
+		? ft_itoa(payload->stats.st_uid) : ft_strdup(passwd->pw_name)))
 		return (1);
 	if (!(payload->group = ((flags & FLAG_NUMERIC) || !group)
-		? ft_itoa(group->gr_gid) : ft_strdup(group->gr_name)))
+		? ft_itoa(payload->stats.st_gid) : ft_strdup(group->gr_name)))
 		return (1);
 	return (0);
 }

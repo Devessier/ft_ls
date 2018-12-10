@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 15:08:31 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 15:28:01 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,18 @@ int		error(char *path)
 {
 	ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno))	;
 	return (1);
+}
+
+void	usage(char c)
+{
+	uint8_t	i;
+
+	i = 0;
+	ft_putf_fd(2, "./ft_ls: illegal option -- %c\n", c);
+	ft_putstr_fd("usage: ./ft_ls [-", 2);
+	while (g_arguments[i].c_flag)
+		ft_putchar_fd(g_arguments[i++].c_flag, 2);
+	ft_putstr_fd("] [file ...]\n", 2);
 }
 
 char	*color_code(t_payload *payload, uint8_t flags)

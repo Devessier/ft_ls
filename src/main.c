@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/07 18:00:44 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 15:25:52 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include "utils.h"
 #include "sort.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 char	*normalize_argument(char **str)
 {
@@ -39,14 +40,24 @@ uint8_t		parse_flags(char *flag)
 {
 	uint8_t	flags;
 	uint8_t	i;
+	uint8_t	found;
 
 	flags = FLAG_NONE;
+	found = 0;
 	while (*++flag)
 	{
 		i = 0;
 		while (g_arguments[i].c_flag)
 			if (g_arguments[i++].c_flag == *flag)
+			{
 				flags |= g_arguments[i - 1].flag;
+				found = 1;
+			}
+		if (!found)
+		{
+			usage(*flag);
+			exit(1);
+		}
 	}
 	if ((flags & FLAG_COLORS_ON) && !isatty(1))
 		flags ^= FLAG_COLORS_ON;

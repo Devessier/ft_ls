@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 14:38:44 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 15:20:02 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ typedef struct		s_file_type
 
 void				list_argument(t_payload *argstat, uint8_t flags);
 int					error(char *path);
+void				usage(char c);
 extern t_file_type	g_file_types[];
 
 #endif

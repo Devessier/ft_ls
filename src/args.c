@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:23:02 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:32:16 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@
 
 t_argument	g_arguments[] =
 {
+	{ 'G', FLAG_COLORS_ON },
+	{ 'U', FLAG_CREATION },
+	{ 'R', FLAG_RECURSIVE },
 	{ 'a', FLAG_INCLUDE_DOTS },
 	{ 'c', FLAG_STATUS_CHANGED },
 	{ 'l', FLAG_LONG_FORMAT },
@@ -32,9 +35,6 @@ t_argument	g_arguments[] =
 	{ 'r', FLAG_REVERSE_SORT },
 	{ 't', FLAG_SORT_TIME_MODIFIED },
 	{ 'u', FLAG_LAST_ACCESS },
-	{ 'G', FLAG_COLORS_ON },
-	{ 'R', FLAG_RECURSIVE },
-	{ 'U', FLAG_CREATION },
 	{ 0, FLAG_NONE }
 };
 

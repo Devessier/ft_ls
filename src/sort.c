@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 13:04:38 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/06 12:45:46 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 13:57:40 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,9 +71,9 @@ void	quick_sort(void **list, int start, int end, int (*f)(void*, void*), uint8_t
 	j = end;
 	while (i <= j)
 	{
-		while (i <= end && (reverse_order ? f(list[i], key) > 0 : f(list[i], key) <= 0))
+		while (i <= end && (reverse_order ? f(list[i], key) > 0 : f(list[i], key) < 0))
 			i++;
-		while (j >= start && (!reverse_order ? f(list[j], key) > 0 : f(list[j], key) <= 0))
+		while (j >= start && (!reverse_order ? f(list[j], key) > 0 : f(list[j], key) < 0))
 			j--;
 		if (i < j)
 			swap(list + i, list + j);

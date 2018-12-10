@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:26:55 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:38:46 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,7 @@ void	print_date(t_payload *payload, t_uflag flags)
 	const	time_t	now = time(NULL);
 	time_t			diff;
 	time_t			timestamp;
-	char	*date;
+	char			*date;
 
 	if (flags & FLAG_LAST_ACCESS)
 		timestamp = payload->stats.st_atimespec.tv_sec;
@@ -160,8 +160,7 @@ void	long_format(t_payload *payload, t_uflag flags, t_maxs *maximums)
 
 	print_file_mode(payload->stats.st_mode, flags);
 	pad(maximums->links_len - nb_len(payload->stats.st_nlink));
-	ft_putf_fd(1, "%d ", payload->stats.st_nlink);
-	ft_putstr_fd(payload->user, 1);
+	ft_putf_fd(1, "%d %s", payload->stats.st_nlink, payload->user);
 	pad(maximums->user - ft_strlen(payload->user) + 2);
 	ft_putf_fd(1, "%s  ", payload->group);
 	pad(maximums->group - ft_strlen(payload->group));

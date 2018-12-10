@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:03:56 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:59:09 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,13 +87,13 @@ int	main(int len, char **args)
 	i = 0;
 	files_args = (t_entries) { 0, 0, 0, NULL };
 	dir_args = (t_entries) { 0, 0, 0, NULL };
-	while (i < len && *args[i] == '-')
+	while (i < len && *args[i] == '-' && args[i][1])
 	{
-		if (args[i][1] == '-')
+		i++;
+		if (args[i - 1][1] == '-')
 			break ;
 		else
-			flags |= parse_flags(args[i]);
-		i++;
+			flags |= parse_flags(args[i - 1]);
 	}
 	files_args.flags = flags;
 	dir_args.flags = flags;

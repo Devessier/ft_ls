@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:05:54 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:26:55 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,12 +121,23 @@ void	pad(ssize_t c)
 		ft_putchar_fd(' ', 1);
 }
 
-void	print_date(const time_t *timestamp)
+void	print_date(t_payload *payload, t_uflag flags)
 {
 	const	time_t	now = time(NULL);
-	const 	time_t	diff = *timestamp > now ? *timestamp - now : now - *timestamp;
-	char	*date = ctime(timestamp);
+	time_t			diff;
+	time_t			timestamp;
+	char	*date;
 
+	if (flags & FLAG_LAST_ACCESS)
+		timestamp = payload->stats.st_atimespec.tv_sec;
+	else if (flags & FLAG_CREATION)
+		timestamp = payload->stats.st_birthtimespec.tv_sec;
+	else if (flags & FLAG_STATUS_CHANGED)
+		timestamp = payload->stats.st_ctimespec.tv_sec;
+	else
+		timestamp = payload->stats.st_mtimespec.tv_sec;
+	diff = timestamp > now ? timestamp - now : now - timestamp;
+	date = ctime(&timestamp);
 	if (diff >= 6 * MONTH)
 	{
 		write(1, date + 4, 7);
@@ -169,7 +180,7 @@ void	long_format(t_payload *payload, t_uflag flags, t_maxs *maximums)
 			pad(maximums->major_len + maximums->minor_len + 1);
 		ft_putf_fd(1, "%d ", payload->stats.st_size);
 	}
-	print_date(&payload->stats.st_mtimespec.tv_sec);
+	print_date(payload, flags);
 	print_color_file(payload, flags);
 }
 

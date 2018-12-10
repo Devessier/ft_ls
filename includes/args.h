@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:00:57 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:23:23 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ typedef enum		e_flag
 	FLAG_NUMERIC = 1 << 6,
 	FLAG_LAST_ACCESS = 1 << 7,
 	FLAG_CREATION = 1 << 8,
+	FLAG_STATUS_CHANGED = 1 << 9,
 }					t_flag;
 
 typedef struct		s_payload

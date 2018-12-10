@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:09:18 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/10 16:23:02 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 t_argument	g_arguments[] =
 {
 	{ 'a', FLAG_INCLUDE_DOTS },
+	{ 'c', FLAG_STATUS_CHANGED },
 	{ 'l', FLAG_LONG_FORMAT },
 	{ 'n', FLAG_NUMERIC },
 	{ 'r', FLAG_REVERSE_SORT },

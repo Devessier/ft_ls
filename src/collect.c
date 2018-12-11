@@ -57,7 +57,7 @@ void	print(const t_entries *files_args, const t_entries *dir_args, int len)
 	print_entry(dir_args, len);
 }
 
-int	collect_entries(char **args, int len, t_uflag flags)
+int		collect_entries(char **args, int len, t_uflag flags)
 {
 	const t_entries	files = (t_entries) { flags, 0, 0, 0 };
 	const t_entries	dir = (t_entries) { flags, 0, 0, 0 };
@@ -85,4 +85,60 @@ int	collect_entries(char **args, int len, t_uflag flags)
 	quick_sort((void**)dir.payloads, 0, dir.len - 1, args_sort, flags);
 	print(&files, &dir, len);
 	return (0);
+}
+
+void	set_longer_string(unsigned int *size, char *str)
+{
+	const size_t	len = ft_strlen(str);
+
+	if (len > *size)
+		*size = len;
+}
+
+void	update_maximums(t_payload *payload, t_maxs *maximums)
+{
+	const unsigned int	major = payload->stats.st_rdev >> 24;
+	const unsigned int	minor = payload->stats.st_rdev & 0xFF;
+
+	if (maximums->major < major)
+		maximums->major = major;
+	if (maximums->minor < minor)
+		maximums->minor = minor;
+	if (payload->stats.st_nlink > maximums->links)
+		maximums->links = payload->stats.st_nlink;
+	if (payload->stats.st_size > maximums->size)
+		maximums->size = payload->stats.st_size;
+	set_longer_string(&(maximums->user), payload->user);
+	set_longer_string(&(maximums->group), payload->group);
+	maximums->blocks += payload->stats.st_blocks;
+}
+
+void	read_directory(const t_entries *entries,
+	t_payload *stats, t_uflag flags, t_maxs *maximums)
+{
+	DIR				*directory;
+	struct dirent	*d;
+	struct stat		s;
+	char			*path;
+	int				i;
+
+	errno = 0;
+	if (!(directory = opendir(stats->d_name)))
+		return ((void)error(stats->d_name));
+	i = 0;
+	while ((d = readdir(directory)) != NULL)
+	{
+		if (*d->d_name == '.' && !(flags & FLAG_INCLUDE_DOTS))
+			continue ;
+		path = pathjoin(stats->d_name, d->d_name);
+		errno = 0;
+		if ((flags & FLAG_LONG_FORMAT ? stat : lstat)(path, &s))
+			error(path);
+		if (append_entry(((t_entries *)entries), s, path, ft_strdup(d->d_name)))
+			return ;
+		if (flags & FLAG_LONG_FORMAT)
+			update_maximums(entries->payloads[i], maximums);
+		i++;
+	}
+	closedir(directory);
 }

@@ -18,7 +18,9 @@
 size_t			ft_strlen(char *str);
 char			*ft_strcat(char *s1, const char *s2);
 void			ft_putf_fd(int fd, const char *format, ...);
-void			ft_putstr_color_fd(char c, char *color, int fd, t_uflag flags);
+void			ft_putchar_color_fd(char c, char *color, int fd, t_uflag flags);
+void			ft_putf_color_fd(int fd, char *color,
+	t_uflag flags, const char *format, ...);
 void			ft_putstr_fd(char *str, int fd);
 void			ft_putnbr_fd(int n, int fd);
 void			ft_putchar_fd(char c, int fd);

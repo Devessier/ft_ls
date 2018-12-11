@@ -83,11 +83,8 @@ void    ft_putnbr_fd(int n, int fd)
 	}
 }
 
-void		ft_putf_fd(int fd, const char *format, ...)
+void		ft_putf_va(int fd, const char *format, va_list args)
 {
-	va_list	args;
-
-	va_start(args, format);
 	while (*format)
 	{
 		if (*format == '%')
@@ -105,10 +102,32 @@ void		ft_putf_fd(int fd, const char *format, ...)
 		else
 			ft_putchar_fd(*format++, fd);
 	}
+}
+
+void		ft_putf_fd(int fd, const char *format, ...)
+{
+	va_list		args;
+
+	va_start(args, format);
+	ft_putf_va(fd, format, args);
 	va_end(args);
 }
 
-void	ft_putstr_color_fd(char c, char *color, int fd, t_uflag flags)
+void		ft_putf_color_fd(int fd, char *color,
+	t_uflag flags, const char *format, ...)
+{
+	va_list		args;
+
+	va_start(args, format);
+	if (flags & FLAG_COLORS_ON)
+		ft_putstr_fd(color, fd);
+	ft_putf_va(fd, format, args);
+	if (flags & FLAG_COLORS_ON)
+		ft_putstr_fd(COLOR_RESET, fd);
+	va_end(args);
+}
+
+void	ft_putchar_color_fd(char c, char *color, int fd, t_uflag flags)
 {
 	if (c == '-')
 		return (ft_putchar_fd('-', fd));
@@ -118,10 +137,10 @@ void	ft_putstr_color_fd(char c, char *color, int fd, t_uflag flags)
 
 char	*pathjoin(char *s1, char *s2)
 {
-	char			*str;
+	char				*str;
 	unsigned int		i;
 	unsigned int		j;
-	size_t			len;
+	size_t				len;
 
 	if (!(s1 && s2))
 		return (NULL);

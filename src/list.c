@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include "collect.h"
 
 t_file_type	g_file_types[] = {
 	{ S_IFIFO, COLOR_FIFO, 'p' },
@@ -84,7 +85,7 @@ void	print_file_type(mode_t perms, t_uflag flags)
 	i = 0;
 	while (g_file_types[i].mode)
 		if ((perms & S_IFMT) == g_file_types[i++].mode)
-			ft_putstr_color_fd(g_file_types[i - 1].to_char,
+			ft_putchar_color_fd(g_file_types[i - 1].to_char,
 					COLOR_FILE_TYPE, 1, flags);
 }
 
@@ -96,20 +97,22 @@ void	print_file_mode(mode_t perms, t_uflag flags)
 	sh = 9;
 	while ((sh -= 3) >= 0)
 	{
-		ft_putstr_color_fd((perms & 4 << sh) ? 'r' : '-', COLOR_READ, 1, flags);
-		ft_putstr_color_fd((perms & 2 << sh) ? 'w' : '-', COLOR_WRITE, 1, flags);
+		ft_putchar_color_fd((perms & 4 << sh) ? 'r' : '-', COLOR_READ, 1, flags);
+		ft_putchar_color_fd((perms & 2 << sh) ? 'w' : '-', COLOR_WRITE, 1, flags);
 		if (sh && ((sh == 6 && !(perms & S_IXUSR) && perms & S_ISUID)
 				|| (sh == 3 && !(perms & S_IXGRP) && perms & S_ISGID)))
-			ft_putstr_color_fd('S', COLOR_S , 1, flags);
+				ft_putchar_color_fd('S', COLOR_S, 1, flags);
 		else if (sh && ((sh == 6 && perms & S_IXUSR && perms & S_ISUID)
 				|| (perms & S_IXGRP && perms & S_ISGID)))
-			ft_putstr_color_fd('s', COLOR_S, 1, flags);
+			ft_putchar_color_fd('s', COLOR_S, 1, flags);
 		else
 		{
 			if (!sh && perms & S_ISVTX)
-				ft_putstr_color_fd(perms & 1 << sh ? 't' : 'T', COLOR_T, 1, flags);
+				ft_putchar_color_fd(perms & 1 << sh ? 't' : 'T',
+					COLOR_T, 1, flags);
 			else
-				ft_putstr_color_fd(perms & 1 << sh ? 'x' : '-', COLOR_EXEC, 1, flags);
+				ft_putchar_color_fd(perms & 1 << sh ? 'x' : '-',
+					COLOR_EXEC, 1, flags);
 		}
 	}
 	ft_putstr_fd("  ", 1);
@@ -150,37 +153,37 @@ void	print_date(t_payload *payload, t_uflag flags)
 
 void	print_color_file(t_payload *payload, t_uflag flags)
 {
-	ft_putf_fd(1, "%s%s%s\n", color_code(payload, flags), payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
+	ft_putf_fd(1, "%s%s%s\n", color_code(payload, flags),
+		payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
 }
 
-void	long_format(t_payload *payload, t_uflag flags, t_maxs *maximums)
+void	long_format(t_payload *p, t_uflag flags, t_maxs *maximums)
 {
-	const t_uflag	special_device = S_ISCHR(payload->stats.st_mode)
-		|| S_ISBLK(payload->stats.st_mode);
+	const t_uflag	sd = S_ISCHR(p->stats.st_mode) || S_ISBLK(p->stats.st_mode);
 
-	print_file_mode(payload->stats.st_mode, flags);
-	pad(maximums->links_len - nb_len(payload->stats.st_nlink));
-	ft_putf_fd(1, "%d %s", payload->stats.st_nlink, payload->user);
-	pad(maximums->user - ft_strlen(payload->user) + 2);
-	ft_putf_fd(1, "%s  ", payload->group);
-	pad(maximums->group - ft_strlen(payload->group));
-	pad(special_device ?
-		maximums->major_len - nb_len(payload->stats.st_rdev >> 24)
-		: maximums->size_len - nb_len(payload->stats.st_size));
-	if (special_device)
+	print_file_mode(p->stats.st_mode, flags);
+	pad(maximums->links_len - nb_len(p->stats.st_nlink));
+	ft_putf_fd(1, "%d %s", p->stats.st_nlink, p->user);
+	pad(maximums->user - ft_strlen(p->user) + 2);
+	ft_putf_fd(1, "%s  ", p->group);
+	pad(maximums->group - ft_strlen(p->group));
+	pad(sd ?
+		maximums->major_len - nb_len(p->stats.st_rdev >> 24)
+		: maximums->size_len - nb_len(p->stats.st_size));
+	if (sd)
 	{
-		ft_putf_fd(1, "%d, ", payload->stats.st_rdev >> 24);
-		pad(maximums->minor_len - nb_len(payload->stats.st_rdev & 0xFF));
-		ft_putf_fd(1, "%d ", payload->stats.st_rdev & 0xFF);
+		ft_putf_fd(1, "%d, ", p->stats.st_rdev >> 24);
+		pad(maximums->minor_len - nb_len(p->stats.st_rdev & 0xFF));
+		ft_putf_fd(1, "%d ", p->stats.st_rdev & 0xFF);
 	}
 	else
 	{
 		if (maximums->major || maximums->minor)
 			pad(maximums->major_len + maximums->minor_len + 1);
-		ft_putf_fd(1, "%d ", payload->stats.st_size);
+		ft_putf_fd(1, "%d ", p->stats.st_size);
 	}
-	print_date(payload, flags);
-	print_color_file(payload, flags);
+	print_date(p, flags);
+	print_color_file(p, flags);
 }
 
 void	list_file(t_payload *payload, t_uflag flags, t_maxs *maximums)
@@ -200,37 +203,6 @@ void	free_stats(t_payload *stats)
 	free(stats);
 }
 
-void	set_longer_string(unsigned int *size, char *str)
-{
-	const size_t	len = ft_strlen(str);
-
-	if (len > *size)
-		*size = len;
-}
-
-void	set_major_minor(t_maxs *maximums, dev_t st_rdev)
-{
-	const unsigned int	major = st_rdev >> 24;
-	const unsigned int	minor = st_rdev & 0xFF;
-
-	if (maximums->major < major)
-		maximums->major = major;
-	if (maximums->minor < minor)
-		maximums->minor = minor;
-}
-
-void	update_maximums(t_payload *payload, t_maxs *maximums)
-{
-	if (payload->stats.st_nlink > maximums->links)
-		maximums->links = payload->stats.st_nlink;
-	if (payload->stats.st_size > maximums->size)
-		maximums->size = payload->stats.st_size;
-	set_longer_string(&(maximums->user), payload->user);
-	set_longer_string(&(maximums->group), payload->group);
-	maximums->blocks += payload->stats.st_blocks;
-	set_major_minor(maximums, payload->stats.st_rdev);
-}
-
 void	calculate_max_len(t_maxs *maximums)
 {
 	maximums->links_len = nb_len(maximums->links);
@@ -241,52 +213,31 @@ void	calculate_max_len(t_maxs *maximums)
 
 void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 {
-	DIR				*directory;
-	t_entries		entries;
-	struct dirent	*d;
+	const t_entries	e = (t_entries) { flags, 0, 0, 0 };
 	int				i;
-	t_maxs			maximums;
-	struct stat		s;
-	char			*path;
+	t_maxs			m;
 
-	maximums = (t_maxs) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	m = (t_maxs) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	if (print_name)
 		ft_putf_fd(1, "\n%s:\n", stats->d_name);
-	entries = (t_entries){ flags, 0, 0, NULL };
-	errno = 0;
-	if (!(directory = opendir(stats->d_name)))
-		return ((void)error(stats->d_name));
-	i = 0;
-	while ((d = readdir(directory)) != NULL)
-	{
-		if (*d->d_name == '.' && !(flags & FLAG_INCLUDE_DOTS))
-			continue ;
-		path = pathjoin(stats->d_name, d->d_name);
-		if ((flags & FLAG_LONG_FORMAT ? stat : lstat)(path, &s))
-			error(path);
-		if (append_entry(&entries, s, path, ft_strdup(d->d_name)))
-			return ;
-		if (flags & FLAG_LONG_FORMAT)
-			update_maximums(entries.payloads[i], &maximums);
-		i++;
-	}
-	calculate_max_len(&maximums);
-	quick_sort((void **)entries.payloads , 0, entries.len - 1, ft_d_name_sort, flags);
+	read_directory(&e, stats, flags, &m);
+	calculate_max_len(&m);
+	quick_sort((void **)e.payloads, 0, e.len - 1, ft_d_name_sort, flags);
 	if (flags & FLAG_LONG_FORMAT)
-		ft_putf_fd(1, "\033[4;34m" "total %d\n" COLOR_RESET, maximums.blocks);
+		ft_putf_color_fd(1, "\033[4;34m", e.flags, "total %d\n", m.blocks);
 	i = 0;
-	while (i < entries.len)
-		list_file(entries.payloads[i++], entries.flags, &maximums);
+	while (i < e.len)
+		list_file(e.payloads[i++], e.flags, &m);
 	i = 0;
-	while ((flags & FLAG_RECURSIVE) && i < entries.len)
+	while ((flags & FLAG_RECURSIVE) && i < e.len)
 	{
-		if (S_ISDIR(entries.payloads[i++]->stats.st_mode))
-			if (ft_strcmp(".", entries.payloads[i]->d_shname) && ft_strcmp("..", entries.payloads[i]->d_shname))
-				list_dir(entries.payloads[i - 1], flags, 1);
-		free_stats(entries.payloads[i - 1]);
+		if (S_ISDIR(e.payloads[i]->stats.st_mode))
+			if (ft_strcmp(".", e.payloads[i]->d_shname) &&
+				ft_strcmp("..", e.payloads[i]->d_shname))
+				list_dir(e.payloads[i], flags, 1);
+		free_stats(e.payloads[i++]);
 	}
-	closedir(directory);
-	free(entries.payloads);
+	free(e.payloads);
 }
 
 void	list_argument(t_payload *argstat, t_uflag flags)

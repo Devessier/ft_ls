@@ -60,19 +60,12 @@ uint8_t	set_group_passwd(t_payload *payload, t_uflag flags)
 	return (0);
 }
 
-int		append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_name, char *short_name, uint8_t watch_sym_link)
+int		append_entry(t_entries *entries, struct stat stats,
+	char *long_name, char *short_name)
 {
-	(void)watch_sym_link;
 	t_payload		**tmp;
 	int				i;
-	struct stat		stats;
-	t_entries		*entries;
 
-
-	errno = 0;
-	if (lstat(long_name, &stats) != 0)
-		return (error(long_name));
-	entries = S_ISDIR(stats.st_mode) ? dir_entries : files_entries;
 	if (entries->len + 1 >= entries->cap)
 	{
 		tmp = entries->payloads;

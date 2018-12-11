@@ -150,7 +150,7 @@ void	print_date(t_payload *payload, t_uflag flags)
 
 void	print_color_file(t_payload *payload, t_uflag flags)
 {
-		ft_putf_fd(1, "%s%s%s\n", color_code(payload, flags), payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
+	ft_putf_fd(1, "%s%s%s\n", color_code(payload, flags), payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
 }
 
 void	long_format(t_payload *payload, t_uflag flags, t_maxs *maximums)
@@ -195,6 +195,8 @@ void	free_stats(t_payload *stats)
 {
 	free(stats->d_shname);
 	free(stats->d_name);
+	free(stats->user);
+	free(stats->group);
 	free(stats);
 }
 
@@ -217,14 +219,35 @@ void	set_major_minor(t_maxs *maximums, dev_t st_rdev)
 		maximums->minor = minor;
 }
 
+void	update_maximums(t_payload *payload, t_maxs *maximums)
+{
+	if (payload->stats.st_nlink > maximums->links)
+		maximums->links = payload->stats.st_nlink;
+	if (payload->stats.st_size > maximums->size)
+		maximums->size = payload->stats.st_size;
+	set_longer_string(&(maximums->user), payload->user);
+	set_longer_string(&(maximums->group), payload->group);
+	maximums->blocks += payload->stats.st_blocks;
+	set_major_minor(maximums, payload->stats.st_rdev);
+}
+
+void	calculate_max_len(t_maxs *maximums)
+{
+	maximums->links_len = nb_len(maximums->links);
+	maximums->size_len = nb_len(maximums->size);
+	maximums->major_len = nb_len(maximums->major);
+	maximums->minor_len = nb_len(maximums->minor);
+}
+
 void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 {
 	DIR				*directory;
 	t_entries		entries;
 	struct dirent	*d;
 	int				i;
-	char			*short_name;
 	t_maxs			maximums;
+	struct stat		s;
+	char			*path;
 
 	maximums = (t_maxs) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	if (print_name)
@@ -238,26 +261,17 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 	{
 		if (*d->d_name == '.' && !(flags & FLAG_INCLUDE_DOTS))
 			continue ;
-		if (append_entry(&entries, &entries, pathjoin(stats->d_name, d->d_name), strdup(d->d_name), 1))
+		path = pathjoin(stats->d_name, d->d_name);
+		if ((flags & FLAG_LONG_FORMAT ? stat : lstat)(path, &s))
+			error(path);
+		if (append_entry(&entries, s, path, ft_strdup(d->d_name)))
 			return ;
 		if (flags & FLAG_LONG_FORMAT)
-		{
-			if (entries.payloads[i]->stats.st_nlink > maximums.links)
-				maximums.links = entries.payloads[i]->stats.st_nlink;
-			if (entries.payloads[i]->stats.st_size > maximums.size)
-				maximums.size = entries.payloads[i]->stats.st_size;
-			set_longer_string(&(maximums.user), entries.payloads[i]->user);
-			set_longer_string(&(maximums.group), entries.payloads[i]->group);
-			maximums.blocks += entries.payloads[i]->stats.st_blocks;
-			set_major_minor(&maximums, entries.payloads[i++]->stats.st_rdev);
-		}
+			update_maximums(entries.payloads[i], &maximums);
+		i++;
 	}
-	maximums.links_len = nb_len(maximums.links);
-	maximums.size_len = nb_len(maximums.size);
-	maximums.major_len = nb_len(maximums.major);
-	maximums.minor_len = nb_len(maximums.minor);
-	if (entries.len > 1)
-		quick_sort((void **)entries.payloads , 0, entries.len - 1, ft_d_name_sort, flags);
+	calculate_max_len(&maximums);
+	quick_sort((void **)entries.payloads , 0, entries.len - 1, ft_d_name_sort, flags);
 	if (flags & FLAG_LONG_FORMAT)
 		ft_putf_fd(1, "\033[4;34m" "total %d\n" COLOR_RESET, maximums.blocks);
 	i = 0;
@@ -266,9 +280,8 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 	i = 0;
 	while ((flags & FLAG_RECURSIVE) && i < entries.len)
 	{
-		short_name = entries.payloads[i]->d_shname;
 		if (S_ISDIR(entries.payloads[i++]->stats.st_mode))
-			if (ft_strcmp(".", short_name) && ft_strcmp("..", short_name))
+			if (ft_strcmp(".", entries.payloads[i]->d_shname) && ft_strcmp("..", entries.payloads[i]->d_shname))
 				list_dir(entries.payloads[i - 1], flags, 1);
 		free_stats(entries.payloads[i - 1]);
 	}

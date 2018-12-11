@@ -61,7 +61,7 @@ typedef struct		s_argument
 extern t_argument	g_arguments[];
 
 void				parse_args(int len, char **args);
-int					append_entry(t_entries *dir_entries, t_entries *files_entries, char *long_name,
-		char *short_name, uint8_t watch_sym_link);
+int					append_entry(t_entries *entries, struct stat stats,
+	char *long_name, char *short_name);
 
 #endif

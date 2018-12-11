@@ -63,8 +63,10 @@ int		collect_entries(char **args, int len, t_uflag flags)
 	const t_entries	dir = (t_entries) { flags, 0, 0, 0 };
 	int				i;
 	struct stat		s;
+	t_maxs			files_maxs;
 
 	i = 0;
+	files_maxs = (t_maxs) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	if (!len)
 	{
 		errno = 0;
@@ -79,8 +81,11 @@ int		collect_entries(char **args, int len, t_uflag flags)
 			error(args[i]);
 		append_entry((t_entries *)(S_ISDIR(s.st_mode) ? &dir : &files),
 			s, args[i], normalize_argument(&args[i]));
+		if (flags & FLAG_LONG_FORMAT && !S_ISDIR(s.st_mode))
+			update_maximums(*files.payloads, &files_maxs);
 		i++;
 	}
+	calculate_max_len(&files_maxs);
 	quick_sort((void**)files.payloads, 0, files.len - 1, args_sort, flags);
 	quick_sort((void**)dir.payloads, 0, dir.len - 1, args_sort, flags);
 	print(&files, &dir, len);

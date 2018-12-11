@@ -58,6 +58,8 @@ typedef struct		s_file_type
 void				list_argument(t_payload *argstat, t_uflag flags);
 int					error(char *path);
 void				usage(char c);
+void				update_maximums(t_payload *payload, t_maxs *maximums);
+void				calculate_max_len(t_maxs *maximums);
 extern t_file_type	g_file_types[];
 
 #endif

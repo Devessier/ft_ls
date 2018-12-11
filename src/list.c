@@ -89,6 +89,16 @@ void	print_file_type(mode_t perms, t_uflag flags)
 					COLOR_FILE_TYPE, 1, flags);
 }
 
+void	print_sticky_bit(int8_t sh, mode_t perms, t_uflag flags)
+{
+	if (!sh && perms & S_ISVTX)
+		ft_putchar_color_fd(perms & 1 << sh ? 't' : 'T',
+			COLOR_T, 1, flags);
+	else
+		ft_putchar_color_fd(perms & 1 << sh ? 'x' : '-',
+			COLOR_EXEC, 1, flags);
+}
+
 void	print_file_mode(mode_t perms, t_uflag flags)
 {
 	int8_t	sh;
@@ -97,23 +107,18 @@ void	print_file_mode(mode_t perms, t_uflag flags)
 	sh = 9;
 	while ((sh -= 3) >= 0)
 	{
-		ft_putchar_color_fd((perms & 4 << sh) ? 'r' : '-', COLOR_READ, 1, flags);
-		ft_putchar_color_fd((perms & 2 << sh) ? 'w' : '-', COLOR_WRITE, 1, flags);
+		ft_putchar_color_fd((perms & 4 << sh) ? 'r' : '-',
+			COLOR_READ, 1, flags);
+		ft_putchar_color_fd((perms & 2 << sh) ? 'w' : '-',
+			COLOR_WRITE, 1, flags);
 		if (sh && ((sh == 6 && !(perms & S_IXUSR) && perms & S_ISUID)
 				|| (sh == 3 && !(perms & S_IXGRP) && perms & S_ISGID)))
-				ft_putchar_color_fd('S', COLOR_S, 1, flags);
+			ft_putchar_color_fd('S', COLOR_S, 1, flags);
 		else if (sh && ((sh == 6 && perms & S_IXUSR && perms & S_ISUID)
 				|| (perms & S_IXGRP && perms & S_ISGID)))
 			ft_putchar_color_fd('s', COLOR_S, 1, flags);
 		else
-		{
-			if (!sh && perms & S_ISVTX)
-				ft_putchar_color_fd(perms & 1 << sh ? 't' : 'T',
-					COLOR_T, 1, flags);
-			else
-				ft_putchar_color_fd(perms & 1 << sh ? 'x' : '-',
-					COLOR_EXEC, 1, flags);
-		}
+			print_sticky_bit(sh, perms, flags);
 	}
 	ft_putstr_fd("  ", 1);
 }

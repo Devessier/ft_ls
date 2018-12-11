@@ -68,14 +68,14 @@ int		collect_entries(char **args, int len, t_uflag flags)
 	if (!len)
 	{
 		errno = 0;
-		if ((flags & FLAG_LONG_FORMAT ? stat : lstat)(".", &s))
+		if (stat(".", &s))
 			error(*args);
 		append_entry((t_entries *)&dir, s, ".", ".");
 	}
 	while (i < len)
 	{
 		errno = 0;
-		if ((flags & FLAG_LONG_FORMAT ? stat : lstat)(args[i], &s) != 0)
+		if ((flags & FLAG_LONG_FORMAT ? lstat : stat)(args[i], &s) != 0)
 			error(args[i]);
 		append_entry((t_entries *)(S_ISDIR(s.st_mode) ? &dir : &files),
 			s, args[i], normalize_argument(&args[i]));
@@ -132,7 +132,7 @@ void	read_directory(const t_entries *entries,
 			continue ;
 		path = pathjoin(stats->d_name, d->d_name);
 		errno = 0;
-		if ((flags & FLAG_LONG_FORMAT ? stat : lstat)(path, &s))
+		if ((flags & FLAG_LONG_FORMAT ? lstat : stat)(path, &s))
 			error(path);
 		if (append_entry(((t_entries *)entries), s, path, ft_strdup(d->d_name)))
 			return ;

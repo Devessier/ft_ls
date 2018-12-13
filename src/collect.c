@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/11 13:34:54 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 13:02:27 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 14:20:35 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,8 @@ void	print(const t_entries *files_args, const t_entries *dir_args, int len, t_ma
 			list_file (files_args->payloads[i], files_args->flags, f_maxs);
 		i++;
 	}
-	if (files_args->len && files_args->len < len)
+	if (files_args->len && files_args->len
+			< files_args->len + dir_args->len)
 		ft_putchar_fd('\n', 1);
 	print_entry(dir_args, len);
 }
@@ -70,10 +71,12 @@ int		collect_entries(char **args, int len, t_uflag flags)
 	const t_entries	files = (t_entries) { flags, 0, 0, 0 };
 	const t_entries	dir = (t_entries) { flags, 0, 0, 0 };
 	int				i;
+	int				j;
 	struct stat		s;
 	t_maxs			files_maxs;
 
 	i = 0;
+	j = 0;
 	files_maxs = (t_maxs) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	if (!len)
 	{
@@ -87,10 +90,13 @@ int		collect_entries(char **args, int len, t_uflag flags)
 		errno = 0;
 		if ((flags & FLAG_LONG_FORMAT ? lstat : stat)(args[i], &s) != 0)
 			error(args[i], flags);
-		append_entry((t_entries *)(S_ISDIR(s.st_mode) ? &dir : &files),
-			s, args[i], normalize_argument(&args[i]));
-		if (flags & FLAG_LONG_FORMAT && !S_ISDIR(s.st_mode))
-			update_maximums(files.payloads[i], &files_maxs);
+		else
+		{
+			append_entry((t_entries *)(S_ISDIR(s.st_mode) ? &dir : &files),
+					s, args[i], normalize_argument(&args[i]));
+			if (flags & FLAG_LONG_FORMAT && !S_ISDIR(s.st_mode))
+				update_maximums(files.payloads[j++], &files_maxs);
+		}
 		i++;
 	}
 	calculate_max_len(&files_maxs);

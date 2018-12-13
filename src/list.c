@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 11:01:17 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 11:48:07 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,11 @@ t_file_type	g_file_types[] = {
 	{ 0, NULL, 0 }
 };
 
-int		error(char *path)
+int		error(char *path, t_uflag flags)
 {
-	ft_putf_fd(2, "ft_ls: %s: %s\n", path, strerror(errno))	;
+	ft_putf_fd(2, "ft_ls: %s: ", path);
+	ft_putf_color_fd(2, COLOR_EXEC, flags, "%s\n", strerror(errno));
+	errno = 0;
 	return (1);
 }
 
@@ -200,12 +202,15 @@ void	list_file(t_payload *payload, t_uflag flags, t_maxs *maximums)
 		long_format(payload, flags, maximums);
 }
 
-void	free_stats(t_payload *stats)
+void	free_stats(t_payload *stats, t_uflag flags)
 {
 	free(stats->d_shname);
 	free(stats->d_name);
-	free(stats->user);
-	free(stats->group);
+	if (flags & FLAG_LONG_FORMAT)
+	{
+		free(stats->user);
+		free(stats->group);
+	}
 	free(stats);
 }
 
@@ -230,7 +235,7 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 		return ;
 	calculate_max_len(&m);
 	quick_sort((void **)e.payloads, 0, e.len - 1, ft_d_name_sort, flags);
-	if (flags & FLAG_LONG_FORMAT)
+	if (flags & FLAG_LONG_FORMAT && e.len)
 		ft_putf_color_fd(1, "\033[4;34m", e.flags, "total %d\n", m.blocks);
 	i = 0;
 	while (i < e.len)
@@ -242,7 +247,7 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 			if (ft_strcmp(".", e.payloads[i]->d_shname) &&
 				ft_strcmp("..", e.payloads[i]->d_shname))
 				list_dir(e.payloads[i], flags, 1);
-		free_stats(e.payloads[i++]);
+		free_stats(e.payloads[i++], flags);
 	}
 	free(e.payloads);
 }

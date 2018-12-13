@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:22:43 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:23:23 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 11:15:45 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct		s_payload
 	char		*group;
 	char		*d_name;
 	char		*d_shname;
+	char		*link;
 }					t_payload;
 
 typedef struct		s_entries

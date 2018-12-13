@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 10:46:47 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 11:36:05 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ typedef struct		s_file_type
 }					t_file_type;
 
 void				list_argument(t_payload *argstat, t_uflag flags);
-int					error(char *path);
+int					error(char *path, t_uflag flags);
 void				usage(char c);
 void				update_maximums(t_payload *payload, t_maxs *maximums);
 void				calculate_max_len(t_maxs *maximums);

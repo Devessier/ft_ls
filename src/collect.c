@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/11 13:34:54 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 11:04:58 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 11:37:48 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,14 +71,14 @@ int		collect_entries(char **args, int len, t_uflag flags)
 	{
 		errno = 0;
 		if (stat(".", &s))
-			error(*args);
+			error(*args, flags);
 		append_entry((t_entries *)&dir, s, ".", ".");
 	}
 	while (i < len)
 	{
 		errno = 0;
 		if ((flags & FLAG_LONG_FORMAT ? lstat : stat)(args[i], &s) != 0)
-			error(args[i]);
+			error(args[i], flags);
 		append_entry((t_entries *)(S_ISDIR(s.st_mode) ? &dir : &files),
 			s, args[i], normalize_argument(&args[i]));
 		if (flags & FLAG_LONG_FORMAT && !S_ISDIR(s.st_mode))
@@ -129,7 +129,7 @@ uint8_t		read_directory(const t_entries *entries,
 
 	errno = 0;
 	if (!(directory = opendir(stats->d_name)))
-		return (error(stats->d_name));
+		return (error(stats->d_name, flags));
 	i = 0;
 	while ((d = readdir(directory)) != NULL)
 	{
@@ -140,7 +140,7 @@ uint8_t		read_directory(const t_entries *entries,
 		if (lstat(path, &s)
 				|| append_entry(((t_entries *)entries), s, path, ft_strdup(d->d_name)))
 		{
-			error(path);
+			error(path, flags);
 			free(path);
 		}
 		if (flags & FLAG_LONG_FORMAT)

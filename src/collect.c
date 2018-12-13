@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/11 13:34:54 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 11:37:48 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 13:02:27 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,17 @@ void		print_entry(const t_entries *entry, int total_args)
 	}
 }
 
-void	print(const t_entries *files_args, const t_entries *dir_args, int len)
+void	print(const t_entries *files_args, const t_entries *dir_args, int len, t_maxs *f_maxs)
 {
-	print_entry(files_args, len);
+	int i;
+
+	i = 0;
+	while (i < files_args->len)
+	{
+		if (files_args->payloads[i]->stats.st_mode)
+			list_file (files_args->payloads[i], files_args->flags, f_maxs);
+		i++;
+	}
 	if (files_args->len && files_args->len < len)
 		ft_putchar_fd('\n', 1);
 	print_entry(dir_args, len);
@@ -82,13 +90,13 @@ int		collect_entries(char **args, int len, t_uflag flags)
 		append_entry((t_entries *)(S_ISDIR(s.st_mode) ? &dir : &files),
 			s, args[i], normalize_argument(&args[i]));
 		if (flags & FLAG_LONG_FORMAT && !S_ISDIR(s.st_mode))
-			update_maximums(*files.payloads, &files_maxs);
+			update_maximums(files.payloads[i], &files_maxs);
 		i++;
 	}
 	calculate_max_len(&files_maxs);
 	quick_sort((void**)files.payloads, 0, files.len - 1, args_sort, flags);
 	quick_sort((void**)dir.payloads, 0, dir.len - 1, args_sort, flags);
-	print(&files, &dir, len);
+	print(&files, &dir, len, &files_maxs);
 	return (0);
 }
 

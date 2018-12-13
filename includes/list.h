@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 11:36:05 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 12:55:03 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ int					error(char *path, t_uflag flags);
 void				usage(char c);
 void				update_maximums(t_payload *payload, t_maxs *maximums);
 void				calculate_max_len(t_maxs *maximums);
+void				list_file(t_payload *payload, t_uflag flags, t_maxs *maximums);
 extern t_file_type	g_file_types[];
 
 #endif

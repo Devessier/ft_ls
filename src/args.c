@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 22:23:19 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 10:20:26 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,22 +70,21 @@ int		append_entry(t_entries *entries, struct stat stats,
 	{
 		tmp = entries->payloads;
 		entries->cap = !entries->cap ? 10 : entries->cap * 2;
-		errno = 0;
 		if (!(entries->payloads = (t_payload **)malloc(sizeof(t_payload *) * entries->cap)))
-			error(long_name);
+		{
+			free(tmp);
+			return (1);
+		}
 		i = -1;
 		while (entries->payloads && ++i < entries->len)
 			entries->payloads[i] = tmp[i];
 		if (tmp && entries->len)
 			free(tmp);
 	}
-	errno = 0;
 	if (!(entries->payloads[entries->len] = (t_payload *)malloc(sizeof(t_payload))))
-		return (error(long_name));
+		return (1);
 	entries->payloads[entries->len]->stats = stats;
 	entries->payloads[entries->len]->d_name = long_name;
 	entries->payloads[entries->len++]->d_shname = short_name;
-	if ((entries->flags & FLAG_LONG_FORMAT) && set_group_passwd(entries->payloads[entries->len - 1], entries->flags))
-		return (error(long_name));
-	return (0);
+	return ((entries->flags & FLAG_LONG_FORMAT) && set_group_passwd(entries->payloads[entries->len - 1], entries->flags) ? error(long_name) : 0);
 }

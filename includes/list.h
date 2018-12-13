@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 11:46:25 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:04:16 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 10:46:47 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@
 # define COLOR_T "\033[38;2;255;241;118m"
 # define COLOR_UID "\033[30;101m"
 # define COLOR_GID "\033[30;106m"
+# define COLOR_SUPER_DIR "\033[30;103m"
+# define COLOR_SUPER_DIR_SAVE "\033[30;42m"
 # define S_AEXEC (S_IXUSR | S_IXGRP | S_IXOTH)
 # define MONTH 3600 * 24 * 30.5
 

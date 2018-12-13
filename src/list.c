@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 17:29:23 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 11:01:17 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,18 +64,19 @@ char	*color_code(t_payload *payload, t_uflag flags)
 
 	if (!(flags & FLAG_COLORS_ON))
 		return ("");
-	if (st_mode & S_ISUID && st_mode & S_AEXEC)
+	if (S_ISDIR(st_mode) && (st_mode & S_IWUSR
+			|| st_mode & S_IWGRP) && st_mode & S_IWOTH)
+		return (st_mode & S_ISVTX ? COLOR_SUPER_DIR_SAVE : COLOR_SUPER_DIR);
+	if (S_ISREG(st_mode) && st_mode & S_ISUID && st_mode & S_AEXEC)
 		return (COLOR_UID);
-	if (st_mode & S_ISGID && st_mode & S_AEXEC)
+	if (S_ISREG(st_mode) && st_mode & S_ISGID && st_mode & S_AEXEC)
 		return (COLOR_GID);
 	i = 0;
 	while (g_file_types[i].mode)
 		if ((st_mode & S_IFMT) == g_file_types[i++].mode
 				&& *g_file_types[i - 1].color)
 			return (g_file_types[i - 1].color);
-	if (st_mode & S_IXUSR)
-		return (COLOR_EXEC);
-	return ("");
+	return (st_mode & S_IXUSR ? COLOR_EXEC : "");
 }
 
 void	print_file_type(mode_t perms, t_uflag flags)
@@ -225,7 +226,8 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 	m = (t_maxs) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	if (print_name)
 		ft_putf_fd(1, "\n%s:\n", stats->d_name);
-	read_directory(&e, stats, flags, &m);
+	if (read_directory(&e, stats, flags, &m))
+		return ;
 	calculate_max_len(&m);
 	quick_sort((void **)e.payloads, 0, e.len - 1, ft_d_name_sort, flags);
 	if (flags & FLAG_LONG_FORMAT)

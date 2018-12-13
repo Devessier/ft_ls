@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/11 13:34:54 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/11 13:51:15 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 11:04:58 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void	update_maximums(t_payload *payload, t_maxs *maximums)
 	maximums->blocks += payload->stats.st_blocks;
 }
 
-void	read_directory(const t_entries *entries,
+uint8_t		read_directory(const t_entries *entries,
 	t_payload *stats, t_uflag flags, t_maxs *maximums)
 {
 	DIR				*directory;
@@ -129,7 +129,7 @@ void	read_directory(const t_entries *entries,
 
 	errno = 0;
 	if (!(directory = opendir(stats->d_name)))
-		return ((void)error(stats->d_name));
+		return (error(stats->d_name));
 	i = 0;
 	while ((d = readdir(directory)) != NULL)
 	{
@@ -137,13 +137,16 @@ void	read_directory(const t_entries *entries,
 			continue ;
 		path = pathjoin(stats->d_name, d->d_name);
 		errno = 0;
-		if ((flags & FLAG_LONG_FORMAT ? lstat : stat)(path, &s))
+		if (lstat(path, &s)
+				|| append_entry(((t_entries *)entries), s, path, ft_strdup(d->d_name)))
+		{
 			error(path);
-		if (append_entry(((t_entries *)entries), s, path, ft_strdup(d->d_name)))
-			return ;
+			free(path);
+		}
 		if (flags & FLAG_LONG_FORMAT)
 			update_maximums(entries->payloads[i], maximums);
 		i++;
 	}
 	closedir(directory);
+	return (0);
 }

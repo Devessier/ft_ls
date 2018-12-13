@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 11:48:07 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 12:40:44 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,8 +161,11 @@ void	print_date(t_payload *payload, t_uflag flags)
 
 void	print_color_file(t_payload *payload, t_uflag flags)
 {
-	ft_putf_fd(1, "%s%s%s\n", color_code(payload, flags),
+	ft_putf_fd(1, "%s%s%s", color_code(payload, flags),
 		payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
+	if (flags & FLAG_LONG_FORMAT && S_ISLNK(payload->stats.st_mode))
+		ft_putf_fd(1, " -> %s", payload->link);
+	ft_putchar_fd('\n', 1);
 }
 
 void	long_format(t_payload *p, t_uflag flags, t_maxs *maximums)

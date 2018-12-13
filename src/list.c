@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 14:43:07 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 15:54:53 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,7 +236,7 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 	if (read_directory(&e, stats, flags, &m))
 		return ;
 	calculate_max_len(&m);
-	quick_sort((void **)e.payloads, 0, e.len - 1, ft_d_name_sort, flags);
+	sort_entries((void**)e.payloads, 0, e.len - 1, flags);
 	if (flags & FLAG_LONG_FORMAT && e.len)
 		ft_putf_color_fd(1, "\033[4;34m", e.flags, "total %d\n", m.blocks);
 	i = 0;
@@ -246,8 +246,8 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 	while ((flags & FLAG_RECURSIVE) && i < e.len)
 	{
 		if (S_ISDIR(e.payloads[i]->stats.st_mode))
-			if (ft_strcmp(".", e.payloads[i]->d_shname) &&
-				ft_strcmp("..", e.payloads[i]->d_shname))
+			if (ft_strcmp(".", e.payloads[i]->d_shname, flags) &&
+				ft_strcmp("..", e.payloads[i]->d_shname, flags))
 				list_dir(e.payloads[i], flags, 1);
 		free_stats(e.payloads[i++], flags);
 	}

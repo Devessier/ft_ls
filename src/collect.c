@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/11 13:34:54 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 14:20:35 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 15:51:02 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,8 +100,8 @@ int		collect_entries(char **args, int len, t_uflag flags)
 		i++;
 	}
 	calculate_max_len(&files_maxs);
-	quick_sort((void**)files.payloads, 0, files.len - 1, args_sort, flags);
-	quick_sort((void**)dir.payloads, 0, dir.len - 1, args_sort, flags);
+	sort_entries((void**)files.payloads, 0, files.len - 1, flags);
+	sort_entries((void**)dir.payloads, 0, dir.len - 1, flags);
 	print(&files, &dir, len, &files_maxs);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 13:04:38 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 12:05:25 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 12:24:55 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include "args.h"
 #include "sort.h"
+#include <stdio.h>
 
 int		ft_strcmp(void *s1, void *s2)
 {
@@ -71,7 +72,7 @@ void	quick_sort(void **list, int start, int end, int (*f)(void*, void*), t_uflag
 	j = end;
 	while (i <= j)
 	{
-		while (i <= end && (reverse_order ? f(list[i], key) > 0 : f(list[i], key) <= 0))
+		while (i <= end && (reverse_order ? f(list[i], key) >= 0 : f(list[i], key) <= 0))
 			i++;
 		while (j >= start && (!reverse_order ? f(list[j], key) > 0 : f(list[j], key) < 0))
 			j--;

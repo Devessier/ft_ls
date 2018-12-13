@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 13:52:38 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/13 14:43:07 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,17 +51,16 @@ void	usage(char c)
 	uint8_t	i;
 
 	i = 0;
-	ft_putf_fd(2, "./ft_ls: illegal option -- %c\n", c);
-	ft_putstr_fd("usage: ./ft_ls [-", 2);
+	ft_putf_fd(2, "ft_ls: illegal option -- %c\n", c);
+	ft_putstr_fd("usage: ft_ls [-", 2);
 	while (g_arguments[i].c_flag)
 		ft_putchar_fd(g_arguments[i++].c_flag, 2);
 	ft_putstr_fd("] [file ...]\n", 2);
 	exit(1);
 }
 
-char	*color_code(t_payload *payload, t_uflag flags)
+char	*color_code(mode_t st_mode, t_uflag flags)
 {
-	const mode_t	st_mode = payload->stats.st_mode;
 	uint8_t			i;
 
 	if (!(flags & FLAG_COLORS_ON))
@@ -89,7 +88,7 @@ void	print_file_type(mode_t perms, t_uflag flags)
 	while (g_file_types[i].mode)
 		if ((perms & S_IFMT) == g_file_types[i++].mode)
 			ft_putchar_color_fd(g_file_types[i - 1].to_char,
-					COLOR_FILE_TYPE, 1, flags);
+					g_file_types[i - 1].color, 1, flags);
 }
 
 void	print_sticky_bit(int8_t sh, mode_t perms, t_uflag flags)
@@ -161,7 +160,7 @@ void	print_date(t_payload *payload, t_uflag flags)
 
 void	print_color_file(t_payload *payload, t_uflag flags)
 {
-	ft_putf_fd(1, "%s%s%s", color_code(payload, flags),
+	ft_putf_fd(1, "%s%s%s", color_code(payload->stats.st_mode, flags),
 		payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
 	if (flags & FLAG_LONG_FORMAT && S_ISLNK(payload->stats.st_mode))
 		ft_putf_fd(1, " -> %s", payload->link);

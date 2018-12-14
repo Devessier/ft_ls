@@ -40,16 +40,15 @@ t_uflag	parse_flags(char *flag)
 		if (!found)
 			usage(*flag);
 	}
-	if ((flags & FLAG_COLORS_ON) && !isatty(1))
-		flags ^= FLAG_COLORS_ON;
 	return (flags);
 }
 
 t_uflag		flags(char **args, int len, int *i)
 {
-	t_uflag	flags;
+	t_uflag		flags;
+	const int	is_tty = isatty(1);
 
-	flags = isatty(1) << 5;
+	flags = is_tty << 5;
 	*i = 0;
 	while (*i < len && *args[*i] == '-' && args[*i][1])
 	{
@@ -58,7 +57,9 @@ t_uflag		flags(char **args, int len, int *i)
 			++*i;
 			break ;
 		}
-		flags |= parse_flags(args[*i]);
+		if ((flags |= parse_flags(args[*i])) & FLAG_COLORS_ON
+			&& !is_tty)
+			flags ^= FLAG_COLORS_ON;
 		++*i;
 	}
 	return (flags);
@@ -67,13 +68,15 @@ t_uflag		flags(char **args, int len, int *i)
 int			main(int len, char **args)
 {
 	int				i;
+	int				j;
 	const t_uflag	fl = flags(++args, --len, &i);
 	const int		total_args = len - i;
 	t_uflag			args_sort_fl;
 
 	args_sort_fl = fl;
+	j = 0;
 	if (fl & FLAG_REVERSE_SORT)
 		args_sort_fl ^= FLAG_REVERSE_SORT;
 	quick_sort((void **)(args + i), 0, total_args - 1, ft_strcmp, args_sort_fl);
-	collect_entries(args + i, total_args, fl);
+	collect_entries(args + i, total_args, fl, &j);
 }

@@ -49,7 +49,8 @@ void		print_entry(const t_entries *entry, int total_args)
 	}
 }
 
-void	print(const t_entries *files_args, const t_entries *dir_args, int len, t_maxs *f_maxs)
+void	print(const t_entries *files_args,
+	const t_entries *dir_args, int len, t_maxs *f_maxs)
 {
 	int i;
 
@@ -57,7 +58,7 @@ void	print(const t_entries *files_args, const t_entries *dir_args, int len, t_ma
 	while (i < files_args->len)
 	{
 		if (files_args->payloads[i]->stats.st_mode)
-			list_file (files_args->payloads[i], files_args->flags, f_maxs);
+			list_file(files_args->payloads[i], files_args->flags, f_maxs);
 		i++;
 	}
 	if (files_args->len && files_args->len
@@ -66,58 +67,52 @@ void	print(const t_entries *files_args, const t_entries *dir_args, int len, t_ma
 	print_entry(dir_args, len);
 }
 
-int		collect_entries(char **args, int len, t_uflag flags)
+void	set_dot(t_entries *dir, t_uflag flags)
+{
+	struct stat	s;
+
+	errno = 0;
+	if (stat(".", &s))
+		error(".", flags);
+	else
+		append_entry(dir, s, ".", ".");
+}
+
+void	collect_entries(char **args, int len, t_uflag flags, int *j)
 {
 	const t_entries	files = (t_entries) { flags, 0, 0, 0 };
 	const t_entries	dir = (t_entries) { flags, 0, 0, 0 };
 	int				i;
-	int				j;
-	struct stat		s;
+	struct stat		stats;
 	t_maxs			files_maxs;
 
-	i = 0;
+	i = -1;
 	j = 0;
 	files_maxs = (t_maxs) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	if (!len)
+		set_dot((t_entries*)&dir, flags);
+	while (++i < len)
 	{
 		errno = 0;
-		if (stat(".", &s))
-			error(*args, flags);
-		append_entry((t_entries *)&dir, s, ".", ".");
-	}
-	while (i < len)
-	{
-		errno = 0;
-		if ((flags & FLAG_LONG_FORMAT ? lstat : stat)(args[i], &s) != 0)
+		if ((flags & FLAG_LONG_FORMAT ? lstat : stat)(args[i], &stats) != 0)
 			error(args[i], flags);
-		else
-		{
-			if (append_entry((t_entries *)(S_ISDIR(s.st_mode) ? &dir : &files),
-					s, args[i], args[i]))
-				if (flags & FLAG_LONG_FORMAT && !S_ISDIR(s.st_mode))
-					update_maximums(files.payloads[j++], &files_maxs);
-		}
-		i++;
+		else if (append_entry((t_entries*)(S_ISDIR(stats.st_mode) ? &dir :
+			&files), stats, args[i], args[i]) && flags & FLAG_LONG_FORMAT
+			&& !S_ISDIR(stats.st_mode))
+			update_maximums(files.payloads[(*j)++], &files_maxs);
 	}
 	calculate_max_len(&files_maxs);
 	sort_entries((void**)files.payloads, 0, files.len - 1, flags);
 	sort_entries((void**)dir.payloads, 0, dir.len - 1, flags);
 	print(&files, &dir, len, &files_maxs);
-	return (0);
-}
-
-void	set_longer_string(size_t *size, char *str)
-{
-	const size_t	len = ft_strlen(str);
-
-	if (len > *size)
-		*size = len;
 }
 
 void	update_maximums(t_payload *payload, t_maxs *maximums)
 {
-	const dev_t	major = payload->stats.st_rdev >> 24;
-	const dev_t	minor = payload->stats.st_rdev & 0xFF;
+	const dev_t		major = payload->stats.st_rdev >> 24;
+	const dev_t		minor = payload->stats.st_rdev & 0xFF;
+	const size_t	usr_len = ft_strlen(payload->user);
+	const size_t	grp_len = ft_strlen(payload->group);
 
 	if (maximums->major < major)
 		maximums->major = major;
@@ -127,8 +122,10 @@ void	update_maximums(t_payload *payload, t_maxs *maximums)
 		maximums->links = payload->stats.st_nlink;
 	if (payload->stats.st_size > maximums->size)
 		maximums->size = payload->stats.st_size;
-	set_longer_string(&(maximums->user), payload->user);
-	set_longer_string(&(maximums->group), payload->group);
+	if (usr_len > maximums->user)
+		maximums->user = usr_len;
+	if (grp_len > maximums->group)
+		maximums->group = grp_len;
 	maximums->blocks += payload->stats.st_blocks;
 }
 

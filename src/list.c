@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/14 11:09:09 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/14 11:24:25 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,11 @@
 t_file_type	g_file_types[] = {
 	{ S_IFIFO, COLOR_FIFO, 'p' },
 	{ S_IFCHR, COLOR_CHR, 'c' },
-	{ S_IFBLK, COLOR_BLK , 'b' },
+	{ S_IFBLK, COLOR_BLK, 'b' },
 	{ S_IFDIR, COLOR_DIR, 'd' },
 	{ S_IFLNK, COLOR_LNK, 'l' },
 	{ S_IFSOCK, COLOR_SOCK, 's' },
-	{ S_IFREG, "" , '-' },
+	{ S_IFREG, "", '-' },
 	{ 0, NULL, 0 }
 };
 
@@ -127,8 +127,6 @@ void	print_file_mode(mode_t perms, t_uflag flags)
 
 void	pad(int64_t c)
 {
-	if (c < 0)
-		sleep(200000);
 	while (c--)
 		ft_putchar_fd(' ', 1);
 }
@@ -173,10 +171,6 @@ void	long_format(t_payload *p, t_uflag flags, t_maxs *maximums)
 {
 	const t_uflag	sd = S_ISCHR(p->stats.st_mode) || S_ISBLK(p->stats.st_mode);
 
-	if (strcmp("tjacquin.vdi", p->d_shname) == 0)
-	{
-		printf("%lld|%lld|%zu\n", p->stats.st_size, maximums->size, maximums->size_len);
-	}
 	print_file_mode(p->stats.st_mode, flags);
 	pad(maximums->links_len - nb_len(p->stats.st_nlink));
 	ft_putf_fd(1, "%d %s", p->stats.st_nlink, p->user);
@@ -230,6 +224,15 @@ void	calculate_max_len(t_maxs *maximums)
 	maximums->minor_len = nb_len(maximums->minor);
 }
 
+void	list_files(const t_entries *entries, t_maxs *maxs)
+{
+	int	i;
+
+	i = 0;
+	while (i < entries->len)
+		list_file(entries->payloads[i++], entries->flags, maxs);
+}
+
 void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 {
 	const t_entries	e = (t_entries) { flags, 0, 0, 0 };
@@ -245,16 +248,14 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 	sort_entries((void**)e.payloads, 0, e.len - 1, flags);
 	if (flags & FLAG_LONG_FORMAT && e.len)
 		ft_putf_color_fd(1, "\033[4;34m", e.flags, "total %d\n", m.blocks);
-	i = 0;
-	while (i < e.len)
-		list_file(e.payloads[i++], e.flags, &m);
+	list_files(&e, &m);
 	i = 0;
 	while ((flags & FLAG_RECURSIVE) && i < e.len)
 	{
-		if (S_ISDIR(e.payloads[i]->stats.st_mode))
-			if (ft_strcmp(".", e.payloads[i]->d_shname, flags) &&
-				ft_strcmp("..", e.payloads[i]->d_shname, flags))
-				list_dir(e.payloads[i], flags, 1);
+		if (S_ISDIR(e.payloads[i]->stats.st_mode)
+			&& ft_strcmp(".", e.payloads[i]->d_shname, flags) &&
+			ft_strcmp("..", e.payloads[i]->d_shname, flags))
+			list_dir(e.payloads[i], flags, 1);
 		free_stats(e.payloads[i++], flags);
 	}
 	free(e.payloads);

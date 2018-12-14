@@ -38,6 +38,15 @@ t_argument	g_arguments[] =
 	{ 0, FLAG_NONE }
 };
 
+uint8_t	free_grp_usr(char *grp, char *usr)
+{
+	if (grp)
+		free(grp);
+	if (usr)
+		free(usr);
+	return (1);
+}
+
 uint8_t	set_group_passwd_link(t_payload *payload, t_uflag flags)
 {
 	struct passwd	*passwd;
@@ -48,27 +57,35 @@ uint8_t	set_group_passwd_link(t_payload *payload, t_uflag flags)
 	passwd = NULL;
 	group = NULL;
 	errno = 0;
-	if (!(passwd = getpwuid(payload->stats.st_uid)) && errno)
+	if ((!(passwd = getpwuid(payload->stats.st_uid)) && errno)
+		|| (!(group = getgrgid(payload->stats.st_gid)) && errno))
 		return (error(payload->d_name, flags));
-	if (!(group = getgrgid(payload->stats.st_gid)) && errno)
-		return (error(payload->d_name, flags));
-	if (!(payload->user = ((flags & FLAG_NUMERIC) || !passwd)
-		? ft_itoa(payload->stats.st_uid) : ft_strdup(passwd->pw_name))
-		|| !(payload->group = ((flags & FLAG_NUMERIC) || !group)
+	if (!(payload->group = ((flags & FLAG_NUMERIC) || !group)
 		? ft_itoa(payload->stats.st_gid) : ft_strdup(group->gr_name)))
 		return (1);
+	if (!(payload->user = ((flags & FLAG_NUMERIC) || !passwd)
+		? ft_itoa(payload->stats.st_uid) : ft_strdup(passwd->pw_name)))
+		return (free_grp_usr(payload->group, NULL));
 	if (S_ISLNK(payload->stats.st_mode))
 	{
 		if ((len = readlink(payload->d_name, buff, sizeof(buff) - 1)) == -1)
-			return (1);
+			free_grp_usr(payload->group, payload->user);
 		buff[len] = '\0';
 		payload->link = ft_strdup(buff);
 	}
 	return (0);
 }
 
+void	set_payload(t_payload *payload, struct stat stats,
+	char *d_name, char *d_shname)
+{
+	payload->stats = stats;
+	payload->d_name = d_name;
+	payload->d_shname = d_shname;
+}
+
 int		append_entry(t_entries *entries, struct stat stats,
-	char *long_name, char *short_name)
+	char *l_n, char *s_h)
 {
 	t_payload		**tmp;
 	int				i;
@@ -77,7 +94,7 @@ int		append_entry(t_entries *entries, struct stat stats,
 	{
 		tmp = entries->payloads;
 		entries->cap = !entries->cap ? 10 : entries->cap * 2;
-		if (!(entries->payloads = (t_payload **)malloc(sizeof(t_payload *) * entries->cap)))
+		if (!(entries->payloads = malloc(sizeof(t_payload *) * entries->cap)))
 		{
 			free(tmp);
 			return (1);
@@ -88,10 +105,10 @@ int		append_entry(t_entries *entries, struct stat stats,
 		if (tmp && entries->len)
 			free(tmp);
 	}
-	if (!(entries->payloads[entries->len] = (t_payload *)malloc(sizeof(t_payload))))
+	if (!(entries->payloads[entries->len] = malloc(sizeof(t_payload))))
 		return (1);
-	entries->payloads[entries->len]->stats = stats;
-	entries->payloads[entries->len]->d_name = long_name;
-	entries->payloads[entries->len++]->d_shname = short_name;
-	return ((entries->flags & FLAG_LONG_FORMAT) && set_group_passwd_link(entries->payloads[entries->len - 1], entries->flags) ? error(long_name, entries->flags) : 0);
+	set_payload(entries->payloads[entries->len++], stats, l_n, s_h);
+	return ((entries->flags & FLAG_LONG_FORMAT) && set_group_passwd_link(
+		entries->payloads[entries->len - 1], entries->flags)
+		? error(l_n, entries->flags) : 0);
 }

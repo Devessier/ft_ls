@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 14:58:02 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/10 16:07:59 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/14 11:10:00 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void			ft_putnbr_fd(int n, int fd);
 void			ft_putchar_fd(char c, int fd);
 void			ft_putendl_fd(char *str, int fd);
 char			*pathjoin(char const *s1, char const *s2);
-size_t			nb_len(int n);
+size_t			nb_len(uint64_t n);
 char			*ft_itoa(int nb);
 char			*ft_strdup(char *s1);
 

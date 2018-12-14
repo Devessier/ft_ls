@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 14:18:58 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/14 09:37:53 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,6 @@ int			main(int len, char **args)
 	args_sort_fl = fl;
 	if (fl & FLAG_REVERSE_SORT)
 		args_sort_fl ^= FLAG_REVERSE_SORT;
-	quick_sort((void **)args, i, len - 1, ft_strcmp, args_sort_fl);
+	quick_sort((void **)(args + i), 0, total_args - 1, ft_strcmp, args_sort_fl);
 	collect_entries(args + i, total_args, fl);
 }

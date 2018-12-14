@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 10:57:31 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 15:54:53 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/14 11:09:09 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,8 +125,10 @@ void	print_file_mode(mode_t perms, t_uflag flags)
 	ft_putstr_fd("  ", 1);
 }
 
-void	pad(ssize_t c)
+void	pad(int64_t c)
 {
+	if (c < 0)
+		sleep(200000);
 	while (c--)
 		ft_putchar_fd(' ', 1);
 }
@@ -171,6 +173,10 @@ void	long_format(t_payload *p, t_uflag flags, t_maxs *maximums)
 {
 	const t_uflag	sd = S_ISCHR(p->stats.st_mode) || S_ISBLK(p->stats.st_mode);
 
+	if (strcmp("tjacquin.vdi", p->d_shname) == 0)
+	{
+		printf("%lld|%lld|%zu\n", p->stats.st_size, maximums->size, maximums->size_len);
+	}
 	print_file_mode(p->stats.st_mode, flags);
 	pad(maximums->links_len - nb_len(p->stats.st_nlink));
 	ft_putf_fd(1, "%d %s", p->stats.st_nlink, p->user);

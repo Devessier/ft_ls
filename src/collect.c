@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/11 13:34:54 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 15:51:02 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/14 11:04:12 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,10 +92,10 @@ int		collect_entries(char **args, int len, t_uflag flags)
 			error(args[i], flags);
 		else
 		{
-			append_entry((t_entries *)(S_ISDIR(s.st_mode) ? &dir : &files),
-					s, args[i], normalize_argument(&args[i]));
-			if (flags & FLAG_LONG_FORMAT && !S_ISDIR(s.st_mode))
-				update_maximums(files.payloads[j++], &files_maxs);
+			if (append_entry((t_entries *)(S_ISDIR(s.st_mode) ? &dir : &files),
+					s, args[i], args[i]))
+				if (flags & FLAG_LONG_FORMAT && !S_ISDIR(s.st_mode))
+					update_maximums(files.payloads[j++], &files_maxs);
 		}
 		i++;
 	}
@@ -106,7 +106,7 @@ int		collect_entries(char **args, int len, t_uflag flags)
 	return (0);
 }
 
-void	set_longer_string(unsigned int *size, char *str)
+void	set_longer_string(size_t *size, char *str)
 {
 	const size_t	len = ft_strlen(str);
 
@@ -116,8 +116,8 @@ void	set_longer_string(unsigned int *size, char *str)
 
 void	update_maximums(t_payload *payload, t_maxs *maximums)
 {
-	const unsigned int	major = payload->stats.st_rdev >> 24;
-	const unsigned int	minor = payload->stats.st_rdev & 0xFF;
+	const dev_t	major = payload->stats.st_rdev >> 24;
+	const dev_t	minor = payload->stats.st_rdev & 0xFF;
 
 	if (maximums->major < major)
 		maximums->major = major;
@@ -154,10 +154,11 @@ uint8_t		read_directory(const t_entries *entries,
 		if (lstat(path, &s)
 				|| append_entry(((t_entries *)entries), s, path, ft_strdup(d->d_name)))
 		{
-			error(path, flags);
+			if (s.st_mode)
+				error(path, flags);
 			free(path);
 		}
-		if (flags & FLAG_LONG_FORMAT)
+		else if (flags & FLAG_LONG_FORMAT)
 			update_maximums(entries->payloads[i], maximums);
 		i++;
 	}

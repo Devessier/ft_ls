@@ -57,8 +57,8 @@ uint8_t	set_group_passwd_link(t_payload *payload, t_uflag flags)
 	passwd = NULL;
 	group = NULL;
 	errno = 0;
-	if ((!(passwd = getpwuid(payload->stats.st_uid)) && errno)
-		|| (!(group = getgrgid(payload->stats.st_gid)) && errno))
+	if ((!(passwd = getpwuid(payload->stats.st_uid))
+		|| !(group = getgrgid(payload->stats.st_gid))) && errno)
 		return (error(payload->d_name, flags));
 	if (!(payload->group = ((flags & FLAG_NUMERIC) || !group)
 		? ft_itoa(payload->stats.st_gid) : ft_strdup(group->gr_name)))
@@ -108,7 +108,7 @@ int		append_entry(t_entries *entries, struct stat stats,
 	if (!(entries->payloads[entries->len] = malloc(sizeof(t_payload))))
 		return (1);
 	set_payload(entries->payloads[entries->len++], stats, l_n, s_h);
-	return ((entries->flags & FLAG_LONG_FORMAT) && set_group_passwd_link(
+	return (entries->flags & FLAG_LONG_FORMAT && set_group_passwd_link(
 		entries->payloads[entries->len - 1], entries->flags)
 		? error(l_n, entries->flags) : 0);
 }

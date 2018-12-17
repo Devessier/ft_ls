@@ -78,28 +78,28 @@ void	set_dot(t_entries *dir, t_uflag flags)
 		append_entry(dir, s, ".", ".");
 }
 
-void	collect_entries(char **args, int len, t_uflag flags, int *j)
+void	collect_entries(char **args, int len, t_uflag flags)
 {
 	const t_entries	files = (t_entries) { flags, 0, 0, 0 };
 	const t_entries	dir = (t_entries) { flags, 0, 0, 0 };
-	int				i;
+	int				i[2];
 	struct stat		stats;
 	t_maxs			files_maxs;
 
-	i = -1;
-	j = 0;
+	i[0] = -1;
+	i[1] = 0;
 	files_maxs = (t_maxs) { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	if (!len)
 		set_dot((t_entries*)&dir, flags);
-	while (++i < len)
+	while (++*i < len)
 	{
 		errno = 0;
-		if ((flags & FLAG_LONG_FORMAT ? lstat : stat)(args[i], &stats) != 0)
-			error(args[i], flags);
+		if ((flags & FLAG_LONG_FORMAT ? lstat : stat)(args[*i], &stats) != 0)
+			error(args[*i], flags);
 		else if (append_entry((t_entries*)(S_ISDIR(stats.st_mode) ? &dir :
-			&files), stats, args[i], args[i]) && flags & FLAG_LONG_FORMAT
-			&& !S_ISDIR(stats.st_mode))
-			update_maximums(files.payloads[(*j)++], &files_maxs);
+				&files), stats, args[*i], args[*i]) == 0)
+			if (flags & FLAG_LONG_FORMAT && !S_ISDIR(stats.st_mode))
+				update_maximums(files.payloads[i[1]++], &files_maxs);
 	}
 	calculate_max_len(&files_maxs);
 	sort_entries((void**)files.payloads, 0, files.len - 1, flags);

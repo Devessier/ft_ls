@@ -68,15 +68,13 @@ t_uflag		flags(char **args, int len, int *i)
 int			main(int len, char **args)
 {
 	int				i;
-	int				j;
 	const t_uflag	fl = flags(++args, --len, &i);
 	const int		total_args = len - i;
 	t_uflag			args_sort_fl;
 
 	args_sort_fl = fl;
-	j = 0;
 	if (fl & FLAG_REVERSE_SORT)
 		args_sort_fl ^= FLAG_REVERSE_SORT;
 	quick_sort((void **)(args + i), 0, total_args - 1, ft_strcmp, args_sort_fl);
-	collect_entries(args + i, total_args, fl, &j);
+	collect_entries(args + i, total_args, fl);
 }

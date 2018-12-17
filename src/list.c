@@ -40,8 +40,9 @@ t_file_type	g_file_types[] = {
 
 int		error(char *path, t_uflag flags)
 {
-	ft_putf_fd(2, "ft_ls: %s: ", path);
-	ft_putf_color_fd(2, COLOR_EXEC, flags, "%s\n", strerror(errno));
+	ft_putf_fd(2, "ft_ls: %s: %s%s%s\n", path, flags & FLAG_COLORS_ON
+		? COLOR_EXEC : "", strerror(errno),
+		flags & FLAG_COLORS_ON ? COLOR_RESET : "");
 	errno = 0;
 	return (1);
 }
@@ -160,8 +161,8 @@ void	print_date(t_payload *payload, t_uflag flags)
 
 void	print_color_file(t_payload *payload, t_uflag flags)
 {
-	ft_putf_fd(1, "%s%s%s", color_code(payload->stats.st_mode, flags),
-		payload->d_shname, (flags & FLAG_COLORS_ON) ? COLOR_RESET : "");
+	ft_putf_color_fd(1, color_code(payload->stats.st_mode, flags),
+		flags, "%s", payload->d_shname);
 	if (flags & FLAG_LONG_FORMAT && S_ISLNK(payload->stats.st_mode))
 		ft_putf_fd(1, " -> %s", payload->link);
 	ft_putchar_fd('\n', 1);

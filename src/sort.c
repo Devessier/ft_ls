@@ -31,35 +31,29 @@ int		ft_strcmp(void *s1, void *s2, t_uflag flags)
 	return ((unsigned char)c_1[i] - (unsigned char)c_2[i]);
 }
 
+time_t	set_time(const struct stat *stat, t_uflag flags)
+{
+	if (flags & FLAG_LAST_ACCESS)
+		return (stat->st_atime);
+	if (flags & FLAG_CREATION)
+		return (stat->st_birthtime);
+	if (flags & FLAG_STATUS_CHANGED)
+		return (stat->st_ctime);
+	return (stat->st_mtime);
+}
+
+int		time_diff(void *d1, void *d2, t_uflag flags)
+{
+	const time_t	time1 = set_time(&((t_payload *)d1)->stats, flags);
+	const time_t	time2 = set_time(&((t_payload *)d2)->stats, flags);
+
+	return (time2 - time1);
+}
+
 int		time_sort(void *d1, void *d2, t_uflag flags)
 {
-	const struct stat	s1 = ((t_payload *)d1)->stats;
-	const struct stat	s2 = ((t_payload *)d2)->stats;
-	struct timespec		time1;
-	struct timespec		time2;
-	time_t				diff;
+	const time_t	diff = time_diff(d1, d2);
 
-	if (flags & FLAG_LAST_ACCESS)
-	{
-		time1 = s1.st_atimespec;
-		time2 = s2.st_atimespec;
-	}
-	else if (flags & FLAG_CREATION)
-	{
-		time1 = s1.st_birthtimespec;
-		time2 = s2.st_birthtimespec;
-	}
-	else if (flags & FLAG_STATUS_CHANGED)
-	{
-		time1 = s1.st_ctimespec;
-		time2 = s2.st_ctimespec;
-	}
-	else
-	{
-		time1 = s1.st_mtimespec;
-		time2 = s2.st_mtimespec;
-	}
-	diff = time2.tv_sec - time1.tv_sec;
 	if (diff == 0)
 		return (ft_d_name_sort(d1, d2, flags));
 	return (diff > 0 ? 1 : -1);

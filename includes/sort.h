@@ -19,5 +19,6 @@ int		ft_d_name_sort(void *d1, void *s2, t_uflag flags);
 int		args_sort(void *a1, void *a2, t_uflag flags);
 int		time_sort(void *a1, void *a2, t_uflag flags);
 void	sort_entries(void **list, int start, int end, t_uflag flags);
+int		time_diff(void *d1, void *d2, t_uflag flags);
 
 #endif

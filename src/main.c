@@ -65,11 +65,6 @@ t_uflag		flags(char **args, int len, int *i)
 	return (flags);
 }
 
-int			sort_cli_args(void *a1, void *a2, t_uflag flags)]
-{
-	return 0;
-}
-
 int			main(int len, char **args)
 {
 	int				i;

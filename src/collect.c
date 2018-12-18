@@ -43,8 +43,11 @@ void		print_entry(const t_entries *entry, int total_args)
 	{
 		if (S_ISDIR(entry->payloads[i]->stats.st_mode)
 			&& total_args > 1 && total_args >= entry->len)
-			ft_putf_fd(1, "%c%s:\n", i && i < total_args ? '\n' : 0,
-				entry->payloads[i]->d_name);
+		{
+			if (i && i < total_args)
+				ft_putchar_fd('\n', 1);
+			ft_putf_fd(1, "%s:\n", entry->payloads[i]->d_name);
+		}
 		list_argument(entry->payloads[i++], entry->flags);
 	}
 }
@@ -140,7 +143,7 @@ uint8_t		read_directory(const t_entries *entries,
 
 	errno = 0;
 	if (!(directory = opendir(stats->d_name)))
-		return (error(stats->d_name, flags));
+		return (error(stats->d_shname, flags));
 	i = 0;
 	while ((d = readdir(directory)) != NULL)
 	{

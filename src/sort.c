@@ -52,7 +52,7 @@ int		time_diff(void *d1, void *d2, t_uflag flags)
 
 int		time_sort(void *d1, void *d2, t_uflag flags)
 {
-	const time_t	diff = time_diff(d1, d2);
+	const time_t	diff = time_diff(d1, d2, flags);
 
 	if (diff == 0)
 		return (ft_d_name_sort(d1, d2, flags));

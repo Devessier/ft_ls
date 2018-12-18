@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/11 13:34:54 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/14 11:04:12 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/18 20:32:30 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,8 +165,7 @@ uint8_t		read_directory(const t_entries *entries,
 			free(path);
 		}
 		else if (flags & FLAG_LONG_FORMAT)
-			update_maximums(entries->payloads[i], maximums);
-		i++;
+			update_maximums(entries->payloads[i++], maximums);
 	}
 	closedir(directory);
 	return (0);

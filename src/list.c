@@ -103,9 +103,10 @@ void	print_sticky_bit(int8_t sh, mode_t perms, t_uflag flags)
 			COLOR_EXEC, 1, flags);
 }
 
-void	print_file_mode(mode_t perms, t_uflag flags)
+void	print_file_mode(t_payload *payload, t_uflag flags)
 {
-	int8_t	sh;
+	const mode_t	perms = payload->stats.st_mode;
+	int8_t			sh;
 
 	print_file_type(perms, flags);
 	sh = 9;
@@ -124,7 +125,12 @@ void	print_file_mode(mode_t perms, t_uflag flags)
 		else
 			print_sticky_bit(sh, perms, flags);
 	}
-	ft_putstr_fd("  ", 1);
+	if (payload->has_ea)
+		ft_putstr_fd("@ ", 1);
+	else if (payload->has_acl)
+		ft_putstr_fd("+ ", 1);
+	else
+		ft_putstr_fd("  ", 1);
 }
 
 void	pad(int64_t c)
@@ -173,7 +179,7 @@ void	long_format(t_payload *p, t_uflag flags, t_maxs *maximums)
 {
 	const t_uflag	sd = S_ISCHR(p->stats.st_mode) || S_ISBLK(p->stats.st_mode);
 
-	print_file_mode(p->stats.st_mode, flags);
+	print_file_mode(p, flags);
 	pad(maximums->links_len - nb_len(p->stats.st_nlink));
 	ft_putf_fd(1, "%d %s", p->stats.st_nlink, p->user);
 	pad(maximums->user - ft_strlen(p->user) + 2);

@@ -17,6 +17,7 @@
 # include <sys/stat.h>
 # include <pwd.h>
 # include <grp.h>
+# include <stdbool.h>
 
 typedef uint16_t	t_uflag;
 
@@ -43,6 +44,8 @@ typedef struct		s_payload
 	char		*d_name;
 	char		*d_shname;
 	char		*link;
+	bool		has_ea;
+	bool		has_acl;
 }					t_payload;
 
 typedef struct		s_entries

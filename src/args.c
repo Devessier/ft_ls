@@ -22,6 +22,8 @@
 #include <unistd.h>
 #include <pwd.h>
 #include <grp.h>
+#include <sys/acl.h>
+#include <sys/xattr.h>
 
 t_argument	g_arguments[] =
 {
@@ -45,6 +47,24 @@ uint8_t	free_grp_usr(char *grp, char *usr)
 	if (usr)
 		free(usr);
 	return (1);
+}
+
+void	set_extd_attr_acl(t_payload *payload)
+{
+	acl_t		acl;
+	ssize_t		extd_attr_len;
+	acl_entry_t	entry;
+
+	acl = NULL;
+	extd_attr_len = listxattr(payload->d_name, NULL, 0, XATTR_NOFOLLOW);
+	acl = acl_get_link_np(payload->d_name, ACL_TYPE_EXTENDED);
+	if (acl && acl_get_entry(acl, ACL_FIRST_ENTRY, &entry) == -1)
+	{
+		acl_free(acl);
+		acl = NULL;
+	}
+	payload->has_acl = !!acl;
+	payload->has_ea = extd_attr_len > 0;
 }
 
 uint8_t	set_group_passwd_link(t_payload *payload, t_uflag flags)
@@ -75,6 +95,12 @@ uint8_t	set_group_passwd_link(t_payload *payload, t_uflag flags)
 			return (free_grp_usr(payload->group, payload->user));
 	}
 	return (0);
+}
+
+uint8_t	set_long_format_data(t_payload *payload, t_uflag flags)
+{
+	set_extd_attr_acl(payload);
+	return (set_group_passwd_link(payload, flags));
 }
 
 void	set_payload(t_payload *payload, struct stat stats,
@@ -109,7 +135,7 @@ int		append_entry(t_entries *entries, struct stat stats,
 	if (!(entries->payloads[entries->len] = malloc(sizeof(t_payload))))
 		return (1);
 	set_payload(entries->payloads[entries->len++], stats, l_n, s_h);
-	return (entries->flags & FLAG_LONG_FORMAT && set_group_passwd_link(
+	return (entries->flags & FLAG_LONG_FORMAT && set_long_format_data(
 		entries->payloads[entries->len - 1], entries->flags)
 		? error(l_n, entries->flags) : 0);
 }

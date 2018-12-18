@@ -17,7 +17,6 @@
 #include "utils.h"
 #include "sort.h"
 #include "list.h"
-#include <stdio.h>
 
 char	*normalize_argument(char **str)
 {
@@ -49,7 +48,11 @@ void		print_entry(const t_entries *entry, int total_args)
 			ft_putf_fd(1, "%s:\n", entry->payloads[i]->d_name);
 		}
 		list_argument(entry->payloads[i++], entry->flags);
+		free_stats(entry->payloads[i - 1], entry->flags, 0,
+			S_ISLNK(entry->payloads[i - 1]->stats.st_mode));
 	}
+	if (entry->payloads)
+		free(entry->payloads);
 }
 
 void	print(const t_entries *files_args,
@@ -60,10 +63,13 @@ void	print(const t_entries *files_args,
 	i = 0;
 	while (i < files_args->len)
 	{
-		if (files_args->payloads[i]->stats.st_mode)
-			list_file(files_args->payloads[i], files_args->flags, f_maxs);
-		i++;
+		if (files_args->payloads[i++]->stats.st_mode)
+			list_file(files_args->payloads[i - 1], files_args->flags, f_maxs);
+		free_stats(files_args->payloads[i - 1], files_args->flags, 0,
+			S_ISLNK(files_args->payloads[i - 1]->stats.st_mode));
 	}
+	if (files_args->payloads)
+		free(files_args->payloads);
 	if (files_args->len && files_args->len
 			< files_args->len + dir_args->len)
 		ft_putchar_fd('\n', 1);
@@ -151,8 +157,8 @@ uint8_t		read_directory(const t_entries *entries,
 			continue ;
 		path = pathjoin(stats->d_name, d->d_name);
 		errno = 0;
-		if (lstat(path, &s)
-				|| append_entry(((t_entries *)entries), s, path, ft_strdup(d->d_name)))
+		if (lstat(path, &s) ||
+			append_entry(((t_entries *)entries), s, path, ft_strdup(d->d_name)))
 		{
 			if (s.st_mode)
 				error(path, flags);

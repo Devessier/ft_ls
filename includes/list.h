@@ -15,6 +15,7 @@
 # include <dirent.h>
 # include <stdint.h>
 # include <sys/types.h>
+# include <stdbool.h>
 # include "args.h"
 # define COLOR_RESET "\033[0m"
 # define COLOR_FIFO "\033[33m"
@@ -33,7 +34,6 @@
 # define COLOR_SUPER_DIR "\033[30;103m"
 # define COLOR_SUPER_DIR_SAVE "\033[30;42m"
 # define S_AEXEC (S_IXUSR | S_IXGRP | S_IXOTH)
-# define MONTH 3600 * 24 * 30.5
 
 typedef struct		s_maxs
 {
@@ -64,6 +64,7 @@ void				update_maximums(t_payload *payload, t_maxs *maximums);
 void				calculate_max_len(t_maxs *maximums);
 void				list_file(t_payload *payload,
 	t_uflag flags, t_maxs *maximums);
+void				free_stats(t_payload *stats, t_uflag flags, bool free_names, bool link);
 extern t_file_type	g_file_types[];
 
 #endif

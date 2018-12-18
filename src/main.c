@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 20:03:51 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/14 09:37:53 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/18 13:24:39 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include "utils.h"
 #include "sort.h"
 #include "collect.h"
+#include <stdlib.h>
 
 t_uflag	parse_flags(char *flag)
 {

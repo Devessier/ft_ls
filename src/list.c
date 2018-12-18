@@ -26,6 +26,7 @@
 #include <time.h>
 #include <unistd.h>
 #include "collect.h"
+#include <stdbool.h>
 
 t_file_type	g_file_types[] = {
 	{ S_IFIFO, COLOR_FIFO, 'p' },
@@ -149,7 +150,7 @@ void	print_date(t_payload *payload, t_uflag flags)
 		timestamp = payload->stats.st_mtimespec.tv_sec;
 	diff = timestamp > now ? timestamp - now : now - timestamp;
 	date = ctime(&timestamp);
-	if (diff >= 6 * MONTH)
+	if (diff > 3600 * 24 * 30.5 * 6)
 	{
 		write(1, date + 4, 7);
 		write(1, date + 19, 5);
@@ -205,15 +206,20 @@ void	list_file(t_payload *payload, t_uflag flags, t_maxs *maximums)
 		long_format(payload, flags, maximums);
 }
 
-void	free_stats(t_payload *stats, t_uflag flags)
+void	free_stats(t_payload *stats, t_uflag flags, bool free_names, bool link)
 {
-	free(stats->d_shname);
-	free(stats->d_name);
+	if (free_names)
+	{
+		free(stats->d_shname);
+		free(stats->d_name);
+	}
 	if (flags & FLAG_LONG_FORMAT)
 	{
 		free(stats->user);
 		free(stats->group);
 	}
+	if (link && flags & FLAG_LONG_FORMAT)
+		free(stats->link);
 	free(stats);
 }
 
@@ -234,6 +240,18 @@ void	list_files(const t_entries *entries, t_maxs *maxs)
 		list_file(entries->payloads[i++], entries->flags, maxs);
 }
 
+void	free_entries(t_entries *entries, t_uflag flags)
+{
+	int	i;
+
+	i = 0;
+	while (i++ < entries->len)
+		free_stats(entries->payloads[i - 1], flags, 1,
+			S_ISLNK(entries->payloads[i - 1]->stats.st_mode));
+	if (entries->payloads)
+		free(entries->payloads);
+}
+
 void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 {
 	const t_entries	e = (t_entries) { flags, 0, 0, 0 };
@@ -244,7 +262,7 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 	if (print_name)
 		ft_putf_fd(1, "\n%s:\n", stats->d_name);
 	if (read_directory(&e, stats, flags, &m))
-		return ;
+		return (free_entries((t_entries*)&e, flags));
 	calculate_max_len(&m);
 	sort_entries((void**)e.payloads, 0, e.len - 1, flags);
 	if (flags & FLAG_LONG_FORMAT && e.len)
@@ -257,9 +275,9 @@ void	list_dir(t_payload *stats, t_uflag flags, uint8_t print_name)
 			&& ft_strcmp(".", e.payloads[i]->d_shname, flags) &&
 			ft_strcmp("..", e.payloads[i]->d_shname, flags))
 			list_dir(e.payloads[i], flags, 1);
-		free_stats(e.payloads[i++], flags);
+		i++;
 	}
-	free(e.payloads);
+	free_entries((t_entries*)&e, flags);
 }
 
 void	list_argument(t_payload *argstat, t_uflag flags)

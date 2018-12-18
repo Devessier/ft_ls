@@ -69,9 +69,10 @@ uint8_t	set_group_passwd_link(t_payload *payload, t_uflag flags)
 	if (S_ISLNK(payload->stats.st_mode))
 	{
 		if ((len = readlink(payload->d_name, buff, sizeof(buff) - 1)) == -1)
-			free_grp_usr(payload->group, payload->user);
+			return (free_grp_usr(payload->group, payload->user));
 		buff[len] = '\0';
-		payload->link = ft_strdup(buff);
+		if (!(payload->link = ft_strdup(buff)))
+			return (free_grp_usr(payload->group, payload->user));
 	}
 	return (0);
 }
@@ -96,7 +97,7 @@ int		append_entry(t_entries *entries, struct stat stats,
 		entries->cap = !entries->cap ? 10 : entries->cap * 2;
 		if (!(entries->payloads = malloc(sizeof(t_payload *) * entries->cap)))
 		{
-			free(tmp);
+			entries->payloads = tmp;
 			return (1);
 		}
 		i = -1;

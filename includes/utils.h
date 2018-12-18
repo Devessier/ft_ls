@@ -13,6 +13,7 @@
 #ifndef UTILS_H
 # define UTILS_H
 # include <string.h>
+# include <stdint.h>
 # include "args.h"
 
 size_t			ft_strlen(char *str);
@@ -27,7 +28,7 @@ void			ft_putchar_fd(char c, int fd);
 void			ft_putendl_fd(char *str, int fd);
 char			*pathjoin(char const *s1, char const *s2);
 size_t			nb_len(uint64_t n);
-char			*ft_itoa(int nb);
+char			*ft_itoa(int64_t nb);
 char			*ft_strdup(char *s1);
 
 #endif

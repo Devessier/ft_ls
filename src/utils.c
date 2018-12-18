@@ -173,7 +173,7 @@ size_t		nb_len(uint64_t n)
 	return (i);
 }
 
-char		*ft_itoa(int n)
+char		*ft_itoa(int64_t n)
 {
 	char	*str;
 	long	pow;

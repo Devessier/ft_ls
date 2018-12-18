@@ -126,9 +126,9 @@ void	print_file_mode(t_payload *payload, t_uflag flags)
 			print_sticky_bit(sh, perms, flags);
 	}
 	if (payload->has_ea)
-		ft_putstr_fd("@ ", 1);
+		ft_putf_color_fd(1, "\033[38;2;95;175;175m", flags, "@ ");
 	else if (payload->has_acl)
-		ft_putstr_fd("+ ", 1);
+		ft_putf_color_fd(1, "\033[38;2;95;255;0m", flags, "+ ");
 	else
 		ft_putstr_fd("  ", 1);
 }

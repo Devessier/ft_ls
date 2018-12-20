@@ -6,21 +6,20 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 09:38:33 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/20 09:47:38 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/20 09:59:40 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdarg.h>
 #include <stddef.h>
-#include "utils.h"
-#include "list.h"
+#include "ft_ls.h"
 
 static int	is_special_char(char c)
 {
 	return (c == 'c' || c == 'd' || c == 's' || c == '%');
 }
 
-size_t	ft_strlen(char *str)
+size_t		ft_strlen(char *str)
 {
 	size_t	len;
 
@@ -30,7 +29,7 @@ size_t	ft_strlen(char *str)
 	return (len);
 }
 
-void	ft_putf_va(int fd, const char *format, va_list args)
+void		ft_putf_va(int fd, const char *format, va_list args)
 {
 	while (*format)
 	{
@@ -51,7 +50,7 @@ void	ft_putf_va(int fd, const char *format, va_list args)
 	}
 }
 
-void	ft_putf_fd(int fd, const char *format, ...)
+void		ft_putf_fd(int fd, const char *format, ...)
 {
 	va_list		args;
 
@@ -60,7 +59,7 @@ void	ft_putf_fd(int fd, const char *format, ...)
 	va_end(args);
 }
 
-void	ft_putf_color_fd(int fd, char *color,
+void		ft_putf_color_fd(int fd, char *color,
 		t_uflag flags, const char *format, ...)
 {
 	va_list		args;

@@ -12,42 +12,21 @@
 
 #include <string.h>
 #include <sys/stat.h>
-#include "args.h"
-#include "sort.h"
-#include <stdio.h>
+#include "ft_ls.h"
 
 int		ft_strcmp(void *s1, void *s2, t_uflag flags)
 {
-	(void)flags;
 	size_t		i;
 	char		*c_1;
 	char		*c_2;
 
+	(void)flags;
 	i = 0;
 	c_1 = (char *)s1;
 	c_2 = (char *)s2;
 	while (c_1[i] == c_2[i] && c_1[i] && c_2[i])
 		i++;
 	return ((unsigned char)c_1[i] - (unsigned char)c_2[i]);
-}
-
-time_t	set_time(const struct stat *stat, t_uflag flags)
-{
-	if (flags & FLAG_LAST_ACCESS)
-		return (stat->st_atime);
-	if (flags & FLAG_CREATION)
-		return (stat->st_birthtime);
-	if (flags & FLAG_STATUS_CHANGED)
-		return (stat->st_ctime);
-	return (stat->st_mtime);
-}
-
-int		time_diff(void *d1, void *d2, t_uflag flags)
-{
-	const time_t	time1 = set_time(&((t_payload *)d1)->stats, flags);
-	const time_t	time2 = set_time(&((t_payload *)d2)->stats, flags);
-
-	return (time2 - time1);
 }
 
 int		time_sort(void *d1, void *d2, t_uflag flags)
@@ -74,13 +53,12 @@ void	swap(void **a, void **b)
 	*b = tmp;
 }
 
-void	quick_sort(void **list, int start, int end, int (*f)(void*, void*, t_uflag), t_uflag flags)
+void	quick_sort(void **list, int start, int end, int (*f)(void*, void*, t_uflag), t_uflag fl)
 {
 	void			*key;
 	int				mid;
 	int				i;
 	int				j;
-	const t_uflag	reverse_order = flags & FLAG_REVERSE_SORT;
 
 	if (!(start < end))
 		return ;
@@ -91,16 +69,18 @@ void	quick_sort(void **list, int start, int end, int (*f)(void*, void*, t_uflag)
 	j = end;
 	while (i <= j)
 	{
-		while (i <= end && (reverse_order ? f(list[i], key, flags) >= 0 : f(list[i], key, flags) <= 0))
+		while (i <= end && (fl & FLAG_REVERSE_SORT ?
+		f(list[i], key, fl) >= 0 : f(list[i], key, fl) <= 0))
 			i++;
-		while (j >= start && (!reverse_order ? f(list[j], key, flags) > 0 : f(list[j], key, flags) < 0))
+		while (j >= start && (!(fl & FLAG_REVERSE_SORT) ?
+		f(list[j], key, fl) > 0 : f(list[j], key, fl) < 0))
 			j--;
 		if (i < j)
 			swap(list + i, list + j);
 	}
 	swap(list + start, list + j);
-	quick_sort(list, start, j - 1, f, flags);
-	quick_sort(list, j + 1, end, f, flags);
+	quick_sort(list, start, j - 1, f, fl);
+	quick_sort(list, j + 1, end, f, fl);
 }
 
 void	sort_entries(void **list, int start, int end, t_uflag flags)

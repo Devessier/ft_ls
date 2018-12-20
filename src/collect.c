@@ -10,13 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "args.h"
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdlib.h>
-#include "utils.h"
-#include "sort.h"
-#include "list.h"
+#include "ft_ls.h"
 
 char	*normalize_argument(char **str)
 {

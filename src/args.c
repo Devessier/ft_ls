@@ -6,24 +6,21 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/13 11:36:45 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/20 10:10:45 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "args.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
-#include "list.h"
 #include <errno.h>
-#include "utils.h"
-#include "sort.h"
 #include <unistd.h>
 #include <pwd.h>
 #include <grp.h>
 #include <sys/acl.h>
 #include <sys/xattr.h>
+#include "ft_ls.h"
 
 t_argument	g_arguments[] =
 {
@@ -40,15 +37,6 @@ t_argument	g_arguments[] =
 	{ 0, FLAG_NONE }
 };
 
-uint8_t	free_grp_usr(char *grp, char *usr)
-{
-	if (grp)
-		free(grp);
-	if (usr)
-		free(usr);
-	return (1);
-}
-
 void	set_extd_attr_acl(t_payload *payload)
 {
 	acl_t		acl;
@@ -59,26 +47,22 @@ void	set_extd_attr_acl(t_payload *payload)
 	extd_attr_len = listxattr(payload->d_name, NULL, 0, XATTR_NOFOLLOW);
 	acl = acl_get_link_np(payload->d_name, ACL_TYPE_EXTENDED);
 	if (acl && acl_get_entry(acl, ACL_FIRST_ENTRY, &entry) == -1)
-	{
-		acl_free(acl);
 		acl = NULL;
-	}
+	if (acl)
+		acl_free(acl);
 	payload->has_acl = !!acl;
 	payload->has_ea = extd_attr_len > 0;
 }
 
 uint8_t	set_group_passwd_link(t_payload *payload, t_uflag flags)
 {
-	struct passwd	*passwd;
-	struct group	*group;
-	char			buff[1025];
-	ssize_t			len;
+	const struct passwd	*passwd = getpwuid(payload->stats.st_uid);
+	const struct group	*group = getgrgid(payload->stats.st_gid);
+	char				buff[1025];
+	ssize_t				len;
 
-	passwd = NULL;
-	group = NULL;
 	errno = 0;
-	if ((!(passwd = getpwuid(payload->stats.st_uid))
-		|| !(group = getgrgid(payload->stats.st_gid))) && errno)
+	if (!(passwd && group) && errno)
 		return (error(payload->d_name, flags));
 	if (!(payload->group = ((flags & FLAG_NUMERIC) || !group)
 		? ft_itoa(payload->stats.st_gid) : ft_strdup(group->gr_name)))
@@ -100,6 +84,7 @@ uint8_t	set_group_passwd_link(t_payload *payload, t_uflag flags)
 uint8_t	set_long_format_data(t_payload *payload, t_uflag flags)
 {
 	set_extd_attr_acl(payload);
+	errno = 0;
 	return (set_group_passwd_link(payload, flags));
 }
 

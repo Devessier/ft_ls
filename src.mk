@@ -6,3 +6,7 @@ SRCS += src/sort.c
 SRCS += src/collect.c
 SRCS += src/putf.c
 SRCS += src/io.c
+SRCS += src/errors.c
+SRCS += src/print.c
+SRCS += src/free.c
+SRCS += src/long_format.c

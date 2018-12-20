@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include "utils.h"
+#include "ft_ls.h"
 
 char	*pathjoin(char *s1, char *s2)
 {
@@ -90,4 +90,25 @@ char	*ft_strdup(char *s1)
 		*dest++ = *s1++;
 	*dest = '\0';
 	return (tmp);
+}
+
+char	*color_code(mode_t st_mode, t_uflag flags)
+{
+	uint8_t			i;
+
+	if (!(flags & FLAG_COLORS_ON))
+		return ("");
+	if (S_ISDIR(st_mode) && (st_mode & S_IWUSR
+			|| st_mode & S_IWGRP) && st_mode & S_IWOTH)
+		return (st_mode & S_ISVTX ? COLOR_SUPER_DIR_SAVE : COLOR_SUPER_DIR);
+	if (S_ISREG(st_mode) && st_mode & S_ISUID && st_mode & S_AEXEC)
+		return (COLOR_UID);
+	if (S_ISREG(st_mode) && st_mode & S_ISGID && st_mode & S_AEXEC)
+		return (COLOR_GID);
+	i = 0;
+	while (g_file_types[i].mode)
+		if ((st_mode & S_IFMT) == g_file_types[i++].mode
+				&& *g_file_types[i - 1].color)
+			return (g_file_types[i - 1].color);
+	return (st_mode & S_IXUSR ? COLOR_EXEC : "");
 }

@@ -10,16 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "args.h"
-#include "list.h"
 #include <stdio.h>
 #include <sys/stat.h>
-#include "utils.h"
-#include <unistd.h>
-#include "utils.h"
-#include "sort.h"
-#include "collect.h"
 #include <stdlib.h>
+#include <unistd.h>
+#include "ft_ls.h"
 
 t_uflag	parse_flags(char *flag)
 {
@@ -44,7 +39,7 @@ t_uflag	parse_flags(char *flag)
 	return (flags);
 }
 
-t_uflag		flags(char **args, int len, int *i)
+t_uflag	flags(char **args, int len, int *i)
 {
 	t_uflag		flags;
 	const int	is_tty = isatty(1);
@@ -66,7 +61,7 @@ t_uflag		flags(char **args, int len, int *i)
 	return (flags);
 }
 
-int			main(int len, char **args)
+int		main(int len, char **args)
 {
 	int				i;
 	const t_uflag	fl = flags(++args, --len, &i);

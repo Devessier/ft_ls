@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <stddef.h>
-#include "utils.h"
+#include "ft_ls.h"
 
 void	ft_putchar_fd(char c, int fd)
 {
@@ -52,4 +52,10 @@ void	ft_putchar_color_fd(char c, char *color, int fd, t_uflag flags)
 	if (c == '-')
 		return (ft_putchar_fd('-', fd));
 	ft_putf_color_fd(fd, color, flags, "%c", c);
+}
+
+void	pad(int64_t c)
+{
+	while (c--)
+		ft_putchar_fd(' ', 1);
 }

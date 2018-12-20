@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/30 14:57:05 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/14 11:10:05 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/20 09:16:49 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,11 @@ void		ft_putendl_fd(char *str, int fd)
 	ft_putchar_fd('\n', fd);
 }
 
-void    ft_putnbr_fd(int n, int fd)
+void    ft_putnbr_fd(int64_t n, int fd)
 {
-	int             pow;
-	int             tmp;
-	char    sign;
+	int		pow;
+	int64_t	tmp;
+	char	sign;
 
 	pow = 1;
 	sign = n < 0 ? -1 : 1;
@@ -92,7 +92,7 @@ void		ft_putf_va(int fd, const char *format, va_list args)
 			if (format[1] == 'c')
 				ft_putchar_fd((char)va_arg(args, int), fd);
 			else if (format[1] == 'd')
-				ft_putnbr_fd(va_arg(args, int), fd);
+				ft_putnbr_fd(va_arg(args, int64_t), fd);
 			else if (format[1] == 's')
 				ft_putstr_fd(va_arg(args, char *), fd);
 			else

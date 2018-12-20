@@ -11,30 +11,31 @@
 /* ************************************************************************** */
 
 #include "ft_ls.h"
+#include <stdio.h>
 
-void	long_format(t_payload *p, t_uflag flags, t_maxs *maximums)
+void	long_format(t_payload *p, t_uflag flags, t_maxs *max)
 {
 	const t_uflag	sd = S_ISCHR(p->stats.st_mode) || S_ISBLK(p->stats.st_mode);
 
 	print_file_mode(p, flags);
-	pad(maximums->links_len - nb_len(p->stats.st_nlink));
+	pad(max->links_len - nb_len(p->stats.st_nlink));
 	ft_putf_fd(1, "%d %s", p->stats.st_nlink, p->user);
-	pad(maximums->user - ft_strlen(p->user) + 2);
+	pad(max->user - ft_strlen(p->user) + 2);
 	ft_putf_fd(1, "%s  ", p->group);
-	pad(maximums->group - ft_strlen(p->group));
-	pad(sd ?
-		maximums->major_len - nb_len(p->stats.st_rdev >> 24)
-		: maximums->size_len - nb_len(p->stats.st_size));
+	pad(max->group - ft_strlen(p->group));
+	pad(sd ? max->major_len - nb_len(p->stats.st_rdev >> 24)
+		: max->size_len - nb_len(p->stats.st_size));
 	if (sd)
 	{
+		pad(max->size ? max->size_len - nb_len(p->stats.st_rdev & 0xFF) : 0);
 		ft_putf_fd(1, "%d, ", p->stats.st_rdev >> 24);
-		pad(maximums->minor_len - nb_len(p->stats.st_rdev & 0xFF));
+		pad(max->minor_len - nb_len(p->stats.st_rdev & 0xFF));
 		ft_putf_fd(1, "%d ", p->stats.st_rdev & 0xFF);
 	}
 	else
 	{
-		if (maximums->major || maximums->minor)
-			pad(maximums->major_len + maximums->minor_len + 1);
+		if (max->major || max->minor)
+			pad(max->major_len + max->minor_len + 1);
 		ft_putf_fd(1, "%d ", p->stats.st_size);
 	}
 	print_date(p, flags);

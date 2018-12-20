@@ -71,6 +71,10 @@ int		main(int len, char **args)
 	args_sort_fl = fl;
 	if (fl & FLAG_REVERSE_SORT)
 		args_sort_fl ^= FLAG_REVERSE_SORT;
-	quick_sort((void **)(args + i), 0, total_args - 1, ft_strcmp, args_sort_fl);
+	quick_sort((void**)(args + i), (t_sort_args) {
+		args_sort_fl,
+		0,
+		total_args - 1
+	}, ft_strcmp);
 	collect_entries(args + i, total_args, fl);
 }

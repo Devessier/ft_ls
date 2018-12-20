@@ -10,3 +10,4 @@ SRCS += src/errors.c
 SRCS += src/print.c
 SRCS += src/free.c
 SRCS += src/long_format.c
+SRCS += src/collect_aux.c

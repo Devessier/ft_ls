@@ -102,6 +102,13 @@ typedef struct		s_file_type
 	char		to_char;
 }					t_file_type;
 
+typedef struct		s_sort_args
+{
+	t_uflag	fl;
+	int		start;
+	int		end;
+}					t_sort_args;
+
 void				parse_args(int len, char **args);
 int					append_entry(t_entries *entries, struct stat stats,
 	char *long_name, char *short_name);
@@ -113,7 +120,7 @@ void				free_stats(t_payload *stats, t_uflag flags,
 void				free_entries(t_entries *entries, t_uflag flags);
 uint8_t				free_grp_usr(char *grp, char *usr);
 void				list_argument(t_payload *argstat, t_uflag flags);
-int					error(char *path, t_uflag flags);
+uint8_t				error(char *path, t_uflag flags);
 void				usage(char c);
 void				update_maximums(t_payload *payload, t_maxs *maximums);
 void				calculate_max_len(t_maxs *maximums);
@@ -126,8 +133,8 @@ void				print_sticky_bit(int8_t sh, mode_t perms, t_uflag flags);
 void				print_file_mode(t_payload *payload, t_uflag flags);
 void				print_date(t_payload *payload, t_uflag flags);
 void				print_color_file(t_payload *payload, t_uflag flags);
-void				quick_sort(void **list, int start, int end,
-	int (*f)(void*, void*, t_uflag), t_uflag flags);
+void				quick_sort(void **list, t_sort_args args,
+	int (*f)(void*, void*, t_uflag));
 int					ft_strcmp(void *s1, void *s2, t_uflag flags);
 int					ft_d_name_sort(void *d1, void *s2, t_uflag flags);
 int					args_sort(void *a1, void *a2, t_uflag flags);
@@ -153,6 +160,12 @@ char				*color_code(mode_t st_mode, t_uflag flags);
 void				long_format(t_payload *p, t_uflag flags, t_maxs *maximums);
 time_t				set_time(const struct stat *stat, t_uflag flags);
 int					time_diff(void *d1, void *d2, t_uflag flags);
+char				*normalize_argument(char **str);
+void				print_entry(const t_entries *entry, int total_args);
+void				print(const t_entries *files_args,
+	const t_entries *dir_args, int len, t_maxs *f_maxs);
+void				sort_entries(void **list, int start,
+	int end, t_uflag flags);
 
 extern t_file_type	g_file_types[];
 extern t_argument	g_arguments[];

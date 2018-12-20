@@ -11,11 +11,12 @@
 /* ************************************************************************** */
 
 #include <errno.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ft_ls.h"
 
-int		error(char *path, t_uflag flags)
+uint8_t	error(char *path, t_uflag flags)
 {
 	ft_putf_fd(2, "ft_ls: %s: ", path);
 	ft_putf_color_fd(2, COLOR_EXEC, flags, "%s", strerror(errno));

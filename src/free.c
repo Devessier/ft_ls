@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include "ft_ls.h"
 
-uint8_t		free_grp_usr(char *grp, char *usr)
+uint8_t	free_grp_usr(char *grp, char *usr)
 {
 	if (grp)
 		free(grp);

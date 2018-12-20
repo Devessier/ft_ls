@@ -53,40 +53,32 @@ void	swap(void **a, void **b)
 	*b = tmp;
 }
 
-void	quick_sort(void **list, int start, int end, int (*f)(void*, void*, t_uflag), t_uflag fl)
+void	quick_sort(void **list, t_sort_args args,
+	int (*f)(void*, void*, t_uflag))
 {
-	void			*key;
-	int				mid;
-	int				i;
-	int				j;
+	const int	mid = (args.start + args.end) / 2;
+	int			i;
+	int			j;
 
-	if (!(start < end))
+	if (!(args.start < args.end))
 		return ;
-	mid = (start + end) / 2;
-	swap(list + start, list + mid);
-	key = list[start];
-	i = start + 1;
-	j = end;
+	swap(list + args.start, list + mid);
+	i = args.start + 1;
+	j = args.end;
 	while (i <= j)
 	{
-		while (i <= end && (fl & FLAG_REVERSE_SORT ?
-		f(list[i], key, fl) >= 0 : f(list[i], key, fl) <= 0))
+		while (i <= args.end && (args.fl & FLAG_REVERSE_SORT ?
+			f(list[i], list[args.start], args.fl) >= 0 :
+			f(list[i], list[args.start], args.fl) <= 0))
 			i++;
-		while (j >= start && (!(fl & FLAG_REVERSE_SORT) ?
-		f(list[j], key, fl) > 0 : f(list[j], key, fl) < 0))
+		while (j >= args.start && (!(args.fl & FLAG_REVERSE_SORT) ?
+			f(list[j], list[args.start], args.fl) > 0 :
+			f(list[j], list[args.start], args.fl) < 0))
 			j--;
 		if (i < j)
 			swap(list + i, list + j);
 	}
-	swap(list + start, list + j);
-	quick_sort(list, start, j - 1, f, fl);
-	quick_sort(list, j + 1, end, f, fl);
-}
-
-void	sort_entries(void **list, int start, int end, t_uflag flags)
-{
-	if (flags & FLAG_SORT_TIME_MODIFIED)
-		quick_sort(list, start, end, time_sort, flags);
-	else
-		quick_sort(list, start, end, ft_d_name_sort, flags);
+	swap(list + args.start, list + j);
+	quick_sort(list, (t_sort_args) { args.fl, args.start, j - 1 }, f);
+	quick_sort(list, (t_sort_args) { args.fl, j + 1, args.end }, f);
 }

@@ -6,12 +6,12 @@
 #    By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/06 16:01:17 by bdevessi          #+#    #+#              #
-#    Updated: 2018/12/10 17:37:55 by bdevessi         ###   ########.fr        #
+#    Updated: 2018/12/20 09:14:27 by bdevessi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ft_ls
-CFLAGS = -Wall -Werror -Wextra -Iincludes -g
+CFLAGS = -Wall -Werror -Wextra -Iincludes
 CC = gcc
 
 include src.mk

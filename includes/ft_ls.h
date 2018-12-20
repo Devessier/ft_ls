@@ -52,6 +52,7 @@ typedef enum		e_flag
 	FLAG_LAST_ACCESS = 1 << 7,
 	FLAG_CREATION = 1 << 8,
 	FLAG_STATUS_CHANGED = 1 << 9,
+	FLAG_ONE_ENTRY_PER_LINE = 1 << 10,
 }					t_flag;
 
 typedef struct		s_payload

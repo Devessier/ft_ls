@@ -16,13 +16,34 @@
 #include <unistd.h>
 #include "ft_ls.h"
 
-t_uflag	parse_flags(char *flag)
+void	xor_flags(char c, t_uflag *flags)
 {
-	t_uflag	flags;
-	t_uflag	i;
+	if (c == 'c')
+	{
+		*flags &= ~(FLAG_CREATION);
+		*flags &= ~(FLAG_LAST_ACCESS);
+	}
+	if (c == 'U')
+	{
+		*flags &= ~(FLAG_STATUS_CHANGED);
+		*flags &= ~(FLAG_LAST_ACCESS);
+	}
+	if (c == 'u')
+	{
+		*flags &= ~(FLAG_STATUS_CHANGED);
+		*flags &= ~(FLAG_CREATION);
+	}
+	if (c == '1')
+		*flags &= ~(FLAG_LONG_FORMAT);
+	if (c == 'l')
+		*flags &= ~(FLAG_ONE_ENTRY_PER_LINE);
+}
+
+void	parse_flags(char *flag, t_uflag *flags)
+{
+	uint8_t	i;
 	uint8_t found;
 
-	flags = FLAG_NONE;
 	while (*++flag)
 	{
 		found = 0;
@@ -30,13 +51,13 @@ t_uflag	parse_flags(char *flag)
 		while (g_arguments[i].c_flag)
 			if (g_arguments[i++].c_flag == *flag)
 			{
-				flags |= g_arguments[i - 1].flag;
+				*flags |= g_arguments[i - 1].flag;
+				xor_flags(g_arguments[i - 1].c_flag, flags);
 				found = 1;
 			}
 		if (!found)
 			usage(*flag);
 	}
-	return (flags);
 }
 
 t_uflag	flags(char **args, int len, int *i)
@@ -53,8 +74,8 @@ t_uflag	flags(char **args, int len, int *i)
 			++*i;
 			break ;
 		}
-		if ((flags |= parse_flags(args[*i])) & FLAG_COLORS_ON
-			&& !is_tty)
+		parse_flags(args[*i], &flags);
+		if (flags & FLAG_COLORS_ON && !is_tty)
 			flags ^= FLAG_COLORS_ON;
 		++*i;
 	}

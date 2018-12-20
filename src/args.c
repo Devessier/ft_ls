@@ -34,6 +34,7 @@ t_argument	g_arguments[] =
 	{ 'r', FLAG_REVERSE_SORT },
 	{ 't', FLAG_SORT_TIME_MODIFIED },
 	{ 'u', FLAG_LAST_ACCESS },
+	{ '1', FLAG_ONE_ENTRY_PER_LINE },
 	{ 0, FLAG_NONE }
 };
 

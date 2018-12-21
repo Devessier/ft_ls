@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 19:29:36 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/21 11:10:00 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/21 11:57:59 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,12 @@ void	set_extd_attr_acl(t_payload *payload)
 	acl = NULL;
 	xattr_len = listxattr(payload->d_name, NULL, 0, XATTR_NOFOLLOW);
 	acl = acl_get_link_np(payload->d_name, ACL_TYPE_EXTENDED);
-	payload->has_acl = acl && acl_get_entry(acl, ACL_FIRST_ENTRY, &entry) == -1;
+	if (acl && acl_get_entry(acl, ACL_FIRST_ENTRY, &entry) == -1)
+	{
+		acl_free(acl);
+		acl = NULL;
+	}
+	payload->has_acl = !!acl;
 	acl_free(acl);
 	payload->has_xattr = xattr_len > 0;
 }

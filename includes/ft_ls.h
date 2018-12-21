@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 11:10:30 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/20 11:10:31 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/21 11:08:44 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ typedef struct		s_payload
 	char		*d_name;
 	char		*d_shname;
 	char		*link;
-	bool		has_ea;
+	bool		has_xattr;
 	bool		has_acl;
 }					t_payload;
 

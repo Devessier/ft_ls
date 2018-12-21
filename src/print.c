@@ -6,7 +6,7 @@
 /*   By: bdevessi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/20 10:38:07 by bdevessi          #+#    #+#             */
-/*   Updated: 2018/12/20 10:38:08 by bdevessi         ###   ########.fr       */
+/*   Updated: 2018/12/21 11:10:23 by bdevessi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,9 @@ void	print_file_mode(t_payload *payload, t_uflag flags)
 		else
 			print_sticky_bit(sh, perms, flags);
 	}
-	if (payload->has_ea || payload->has_acl)
-		ft_putf_color_fd(1, payload->has_ea ? "\033[38;2;95;175;175m"
-		: "\033[38;2;95;255;0m", flags, payload->has_ea ? "@ " : "+ ");
+	if (payload->has_xattr || payload->has_acl)
+		ft_putf_color_fd(1, payload->has_xattr ? "\033[38;2;95;175;175m"
+		: "\033[38;2;95;255;0m", flags, payload->has_xattr ? "@ " : "+ ");
 	else
 		ft_putstr_fd("  ", 1);
 }
